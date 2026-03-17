@@ -47,6 +47,7 @@ import (
 	protosignalling "github.com/livekit/protocol/signalling"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
+	"github.com/livekit/protocol/utils/mono"
 	"github.com/livekit/protocol/utils/pointer"
 	"github.com/livekit/psrpc"
 
@@ -1939,7 +1940,7 @@ func (p *ParticipantImpl) setupSignalling() {
 }
 
 func (p *ParticipantImpl) setupTransportManager() error {
-	p.twcc = twcc.NewTransportWideCCResponder()
+	p.twcc = twcc.NewTransportWideCCResponder(mono.UnixNano())
 	p.twcc.OnFeedback(func(pkts []rtcp.Packet) {
 		p.postRtcp(pkts)
 	})
