@@ -1,6 +1,6 @@
 module github.com/livekit/livekit-server
 
-go 1.26.1
+go 1.26.3
 
 require (
 	github.com/bep/debounce v1.2.1
