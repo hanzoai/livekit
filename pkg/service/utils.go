@@ -15,10 +15,13 @@
 package service
 
 import (
+	"bytes"
+	"compress/gzip"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"regexp"
@@ -38,6 +41,32 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 )
+
+var (
+	ErrGzipReadFailed = errors.New("cannot read decompressed data")
+	ErrGzipTooLarge   = errors.New("decompressed data too large")
+)
+
+var gzipReaderPool = sync.Pool{
+	New: func() any { return &gzip.Reader{} },
+}
+
+func DecompressGzip(compressed []byte) ([]byte, error) {
+	reader := gzipReaderPool.Get().(*gzip.Reader)
+	defer gzipReaderPool.Put(reader)
+	if err := reader.Reset(bytes.NewReader(compressed)); err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrGzipReadFailed, err)
+	}
+
+	out, err := io.ReadAll(io.LimitReader(reader, http.DefaultMaxHeaderBytes+1))
+	if err != nil {
+		return nil, fmt.Errorf("%w: %w", ErrGzipReadFailed, err)
+	}
+	if len(out) > http.DefaultMaxHeaderBytes {
+		return nil, ErrGzipTooLarge
+	}
+	return out, nil
+}
 
 func handleError(w http.ResponseWriter, r *http.Request, status int, err error, keysAndValues ...any) {
 	keysAndValues = append(keysAndValues, "status", status)
@@ -109,6 +138,7 @@ func SetRoomConfiguration(createRequest *livekit.CreateRoomRequest, conf *liveki
 	createRequest.MaxPlayoutDelay = conf.MaxPlayoutDelay
 	createRequest.SyncStreams = conf.SyncStreams
 	createRequest.Metadata = conf.Metadata
+	createRequest.Tags = conf.Tags
 }
 
 func ParseClientInfo(r *http.Request) *livekit.ClientInfo {
@@ -158,6 +188,18 @@ func ParseClientInfo(r *http.Request) *livekit.ClientInfo {
 	ci.DeviceModel = values.Get("device_model")
 	ci.Network = values.Get("network")
 
+	if capStr := values.Get("capabilities"); capStr != "" {
+		for _, name := range strings.Split(capStr, ",") {
+			name = strings.TrimSpace(name)
+			if name == "" {
+				continue
+			}
+			if v, ok := livekit.ClientInfo_Capability_value[name]; ok {
+				ci.Capabilities = append(ci.Capabilities, livekit.ClientInfo_Capability(v))
+			}
+		}
+	}
+
 	AugmentClientInfo(ci, r)
 
 	return ci
@@ -204,6 +246,10 @@ func getUserAgentParser() *uaparser.Parser {
 }
 
 func AugmentClientInfo(ci *livekit.ClientInfo, req *http.Request) {
+	if ci == nil {
+		return
+	}
+
 	// get real address (forwarded http header) - check Cloudflare headers first, fall back to X-Forwarded-For
 	ci.Address = GetClientIP(req)
 
@@ -357,4 +403,20 @@ func ValidateConnectRequest(
 
 	res.grants = claims
 	return res, http.StatusOK, nil
+}
+
+func IsRTCPath(path string) bool {
+	return path == "/rtc" || path == "/rtc/v1"
+}
+
+func IsRTCValidatePath(path string) bool {
+	return path == "/rtc/validate" || path == "/rtc/v1/validate"
+}
+
+func IsAgentWorkerPath(path string) bool {
+	return path == "/agent"
+}
+
+func IsAgentPath(path string) bool {
+	return strings.HasPrefix(path, "/agent")
 }

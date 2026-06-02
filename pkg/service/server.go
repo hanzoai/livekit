@@ -27,7 +27,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/pion/turn/v4"
+	"github.com/pion/turn/v5"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
 	"github.com/twitchtv/twirp"
@@ -378,7 +378,7 @@ func (s *LivekitServer) healthCheck(w http.ResponseWriter, _ *http.Request) {
 	}
 	if time.Since(updatedAt) > 4*time.Second {
 		w.WriteHeader(http.StatusNotAcceptable)
-		_, _ = w.Write([]byte(fmt.Sprintf("Not Ready\nNode Updated At %s", updatedAt)))
+		_, _ = fmt.Fprintf(w, "Not Ready\nNode Updated At %s", updatedAt)
 		return
 	}
 
