@@ -15,6 +15,7 @@
 package rtc
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"maps"
@@ -56,6 +57,7 @@ import (
 	"github.com/livekit/livekit-server/pkg/telemetry/prometheus"
 	"github.com/livekit/livekit-server/pkg/utils"
 	lkinterceptor "github.com/livekit/mediatransportutil/pkg/interceptor"
+	"github.com/livekit/mediatransportutil/pkg/rtcconfig"
 	lktwcc "github.com/livekit/mediatransportutil/pkg/twcc"
 	"github.com/livekit/protocol/codecs/mime"
 	"github.com/livekit/protocol/livekit"
@@ -74,6 +76,7 @@ const (
 	negotiationFrequency       = 150 * time.Millisecond
 	negotiationFailedTimeout   = 15 * time.Second
 	dtlsRetransmissionInterval = 100 * time.Millisecond
+	dtlsHandshakeTimeout       = time.Minute
 
 	iceDisconnectedTimeout = 10 * time.Second                          // compatible for ice-lite with firefox client
 	iceFailedTimeout       = 5 * time.Second                           // time between disconnected and failed
@@ -189,6 +192,19 @@ type trackDescription struct {
 	sender *webrtc.RTPSender
 }
 
+func (t trackDescription) MarshalLogObject(e zapcore.ObjectEncoder) error {
+	e.AddString("mid", t.mid)
+	if t.sender != nil {
+		track := t.sender.Track()
+		if track != nil {
+			e.AddString("trackID", track.ID())
+		}
+	}
+	return nil
+}
+
+// -------------------------------------------------------------------
+
 // PCTransport is a wrapper around PeerConnection, with some helper methods
 type PCTransport struct {
 	params       TransportParams
@@ -291,7 +307,8 @@ type TransportParams struct {
 	Twcc                          *lktwcc.Responder
 	DirectionConfig               DirectionConfig
 	CongestionControlConfig       config.CongestionControlConfig
-	EnabledCodecs                 []*livekit.Codec
+	EnabledPublishCodecs          []*livekit.Codec
+	EnabledSubscribeCodecs        []*livekit.Codec
 	Logger                        logger.Logger
 	Transport                     livekit.SignalTarget
 	SimTracks                     map[uint32]sfuinterceptor.SimulcastTrackInfo
@@ -323,7 +340,11 @@ func newPeerConnection(
 	// Some of the browser clients do not handle H.264 High Profile in signalling properly.
 	// They still decode if the actual stream is H.264 High Profile, but do not handle it well in signalling.
 	// So, disable H.264 High Profile for SUBSCRIBER peer connection to ensure it is not offered.
-	me, err := createMediaEngine(params.EnabledCodecs, directionConfig, params.IsOfferer)
+	//
+	// Single-PC mode registers the union of publish and subscribe codecs so subscriptions
+	// can negotiate subscribe-only codecs; per-direction filtering happens at the transceiver
+	// level (configureSenderCodecs, restrictReceiverCodecsToPublishList).
+	me, err := createMediaEngine(mergeCodecsByMime(params.EnabledPublishCodecs, params.EnabledSubscribeCodecs), directionConfig, params.IsOfferer)
 	if err != nil {
 		return nil, nil, nil, err
 	}
@@ -387,6 +408,9 @@ func newPeerConnection(
 		se.SetLite(false)
 	}
 	se.SetDTLSRetransmissionInterval(dtlsRetransmissionInterval)
+	se.SetDTLSConnectContextMaker(func() (context.Context, func()) {
+		return context.WithTimeout(context.Background(), dtlsHandshakeTimeout)
+	})
 	se.SetICETimeouts(iceDisconnectedTimeout, iceFailedTimeout, iceKeepaliveInterval)
 
 	// if client don't support prflx over relay, we should not expose private address to it, use single external ip as host candidate
@@ -403,7 +427,9 @@ func newPeerConnection(
 		}
 		if len(nat1to1Ips) > 0 {
 			params.Logger.Infow("client doesn't support prflx over relay, use external ip only as host candidate", "ips", nat1to1Ips)
-			se.SetNAT1To1IPs(nat1to1Ips, webrtc.ICECandidateTypeHost)
+			if err := rtcconfig.SetNAT1To1AddressRewriteRules(&se, nat1to1Ips, false); err != nil {
+				params.Logger.Warnw("failed to set ICE address rewrite rules", err, "ips", nat1to1Ips)
+			}
 			se.SetIPFilter(func(ip net.IP) bool {
 				if ip.To4() == nil {
 					return true
@@ -414,10 +440,7 @@ func newPeerConnection(
 		}
 	}
 
-	lf := pionlogger.NewLoggerFactory(params.Logger)
-	if lf != nil {
-		se.LoggerFactory = lf
-	}
+	se.LoggerFactory = pionlogger.NewLoggerFactory(params.Logger)
 
 	ir := &interceptor.Registry{}
 	if params.IsSendSide {
@@ -1510,6 +1533,10 @@ func (t *PCTransport) Close() {
 		return
 	}
 
+	if err := t.pc.Close(); err != nil {
+		t.params.Logger.Warnw("unclean close of peer connection", err)
+	}
+
 	<-t.eventsQueue.Stop()
 	t.clearSignalStateCheckTimer()
 
@@ -1549,10 +1576,6 @@ func (t *PCTransport) Close() {
 	}
 	t.unlabeledDataChannels = nil
 	t.lock.Unlock()
-
-	if err := t.pc.Close(); err != nil {
-		t.params.Logger.Warnw("unclean close of peer connection", err)
-	}
 
 	t.outputAndClearICEStats()
 }
@@ -2154,6 +2177,7 @@ func (t *PCTransport) initPCWithPreviousAnswer(previousAnswer webrtc.SessionDesc
 		}
 		mid := lksdp.GetMidValue(m)
 		if mid == "" {
+			t.params.Logger.Warnw("cannot set up peer connection with previous answer, mid not found", nil, "senders", slices.Collect(maps.Keys(senders)))
 			return senders, ErrMidNotFound
 		}
 		tr.SetMid(mid)
@@ -2165,6 +2189,7 @@ func (t *PCTransport) initPCWithPreviousAnswer(previousAnswer webrtc.SessionDesc
 		// set transceiver to inactive
 		tr.SetSender(sender, nil)
 	}
+	t.params.Logger.Debugw("set up peer connection with previous answer", "senders", slices.Collect(maps.Keys(senders)))
 	return senders, nil
 }
 
@@ -2200,7 +2225,7 @@ func (t *PCTransport) SetPreviousSdp(localDescription, remoteDescription *webrtc
 	}
 
 	if localDescription != nil && parseMids {
-		// in migration case, can't reuse transceiver before negotiating excepted tracks
+		// in migration case, can't reuse transceiver before negotiating expected tracks
 		// that were subscribed at previous node
 		t.canReuseTransceiver = false
 		if err := t.parseTrackMid(*localDescription, senders); err != nil {
@@ -2243,6 +2268,9 @@ func (t *PCTransport) parseTrackMid(sd webrtc.SessionDescription, senders map[st
 				t.previousTrackDescription[trackID] = &trackDescription{mid, sender}
 			}
 		}
+	}
+	if len(t.previousTrackDescription) != 0 {
+		t.params.Logger.Debugw("previous track description", t.previousTrackDescription)
 	}
 	return nil
 }
@@ -2524,11 +2552,12 @@ func (t *PCTransport) createAndSendOffer(options *webrtc.OfferOptions) error {
 	}
 
 	// when there's an ongoing negotiation, let it finish and not disrupt its state
-	if t.negotiationState == transport.NegotiationStateRemote {
+	switch t.negotiationState {
+	case transport.NegotiationStateRemote:
 		t.params.Logger.Debugw("skipping negotiation, trying again later")
 		t.setNegotiationState(transport.NegotiationStateRetry)
 		return nil
-	} else if t.negotiationState == transport.NegotiationStateRetry {
+	case transport.NegotiationStateRetry:
 		// already set to retry, we can safely skip this attempt
 		return nil
 	}
@@ -2684,6 +2713,7 @@ func (t *PCTransport) setRemoteDescription(sd webrtc.SessionDescription) error {
 		if !t.canReuseTransceiver {
 			t.canReuseTransceiver = true
 			t.previousTrackDescription = make(map[string]*trackDescription)
+			t.params.Logger.Debugw("enabling transceiver reuse")
 		}
 		t.lock.Unlock()
 	}
@@ -2707,6 +2737,8 @@ func (t *PCTransport) createAndSendAnswer() error {
 	t.numOutstandingAudios, t.numOutstandingVideos = numOutstandingAudios, numOutstandingVideos
 	t.numRequestSentAudios, t.numRequestSentVideos = 0, 0
 	t.lock.Unlock()
+
+	t.restrictReceiverCodecsToPublishList()
 
 	answer, err := t.pc.CreateAnswer(nil)
 	if err != nil {
@@ -2766,6 +2798,7 @@ func (t *PCTransport) createAndSendAnswer() error {
 	if !t.canReuseTransceiver {
 		t.canReuseTransceiver = true
 		t.previousTrackDescription = make(map[string]*trackDescription)
+		t.params.Logger.Debugw("enabling transceiver reuse")
 	}
 	t.lock.Unlock()
 
@@ -3091,6 +3124,34 @@ func configureSenderCodecs(
 		filterOutH264HighProfile,
 	)
 	tr.SetCodecPreferences(filteredCodecs)
+}
+
+// restrictReceiverCodecsToPublishList narrows recv-side transceiver codec
+// preferences to the publish list, so the answer doesn't advertise
+// subscribe-only codecs as receivable. No-op in dual-PC mode.
+func (t *PCTransport) restrictReceiverCodecsToPublishList() {
+	for _, tr := range t.pc.GetTransceivers() {
+		if tr.Direction() != webrtc.RTPTransceiverDirectionRecvonly &&
+			tr.Direction() != webrtc.RTPTransceiverDirectionSendrecv {
+			continue
+		}
+		receiver := tr.Receiver()
+		if receiver == nil {
+			continue
+		}
+		filtered := filterCodecs(
+			receiver.GetParameters().Codecs,
+			t.params.EnabledPublishCodecs,
+			t.params.DirectionConfig.RTCPFeedback,
+			false,
+		)
+		if len(filtered) == 0 {
+			continue
+		}
+		if err := tr.SetCodecPreferences(filtered); err != nil {
+			t.params.Logger.Warnw("failed to set recv codec preferences", err, "mid", tr.Mid())
+		}
+	}
 }
 
 func configureReceiverCodecs(

@@ -22,7 +22,7 @@ import (
 	"os"
 
 	"github.com/google/wire"
-	"github.com/pion/turn/v4"
+	"github.com/pion/turn/v5"
 	"github.com/pkg/errors"
 	"github.com/redis/go-redis/v9"
 	"gopkg.in/yaml.v3"
@@ -56,11 +56,11 @@ func InitializeServer(conf *config.Config, currentNode routing.LocalNode) (*Live
 		getNodeStatsConfig,
 		routing.CreateRouter,
 		getLimitConf,
-		config.DefaultAPIConfig,
+		getAPIConf,
 		wire.Bind(new(routing.MessageRouter), new(routing.Router)),
 		wire.Bind(new(livekit.RoomService), new(*RoomService)),
 		telemetry.NewAnalyticsService,
-		telemetry.NewTelemetryService,
+		createTelemetryService,
 		getMessageBus,
 		NewIOInfoService,
 		wire.Bind(new(IOClient), new(*IOInfoService)),
@@ -169,6 +169,14 @@ func createWebhookNotifier(conf *config.Config, provider auth.KeyProvider) (webh
 	}
 
 	return webhook.NewDefaultNotifier(wc, provider)
+}
+
+func createTelemetryService(notifier webhook.QueuedNotifier, analytics telemetry.AnalyticsService) telemetry.TelemetryService {
+	svc := telemetry.NewTelemetryService(notifier, analytics)
+	if notifier != nil {
+		notifier.RegisterProcessedHook(svc.Webhook)
+	}
+	return svc
 }
 
 func createRedisClient(conf *config.Config) (redis.UniversalClient, error) {
@@ -290,4 +298,8 @@ func getNodeStatsConfig(config *config.Config) config.NodeStatsConfig {
 
 func getAgentConfig(config *config.Config) agent.Config {
 	return config.Agents
+}
+
+func getAPIConf(config *config.Config) config.APIConfig {
+	return config.API
 }

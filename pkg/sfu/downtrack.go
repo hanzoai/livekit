@@ -43,6 +43,7 @@ import (
 	"github.com/livekit/livekit-server/pkg/sfu/ccutils"
 	"github.com/livekit/livekit-server/pkg/sfu/connectionquality"
 	"github.com/livekit/livekit-server/pkg/sfu/pacer"
+	"github.com/livekit/livekit-server/pkg/sfu/packettrailer"
 	act "github.com/livekit/livekit-server/pkg/sfu/rtpextension/abscapturetime"
 	dd "github.com/livekit/livekit-server/pkg/sfu/rtpextension/dependencydescriptor"
 	pd "github.com/livekit/livekit-server/pkg/sfu/rtpextension/playoutdelay"
@@ -261,6 +262,7 @@ type DownTrackListener interface {
 	OnRttUpdate(rtt uint32)
 	OnCodecNegotiated(webrtc.RTPCodecCapability)
 	OnDownTrackClose(isExpectedToResume bool)
+	OnStreamStarted()
 }
 
 // -------------------------------------------------------------------
@@ -309,6 +311,7 @@ type DownTrackParams struct {
 	RTCPWriter                     func([]rtcp.Packet) error
 	DisableSenderReportPassThrough bool
 	SupportsCodecChange            bool
+	StripPacketTrailer             bool
 	Listener                       DownTrackListener
 }
 
@@ -382,6 +385,7 @@ type DownTrack struct {
 	blankFramesGeneration atomic.Uint32
 
 	connectionStats *connectionquality.ConnectionStats
+	onStatsUpdate   atomic.Value // func(d *DownTrack, stat *livekit.AnalyticsStat)
 
 	isNACKThrottled atomic.Bool
 
@@ -468,6 +472,9 @@ func NewDownTrack(params DownTrackParams) (*DownTrack, error) {
 	})
 	d.connectionStats.OnStatsUpdate(func(_cs *connectionquality.ConnectionStats, stat *livekit.AnalyticsStat) {
 		d.params.Listener.OnStatsUpdate(stat)
+		if fn, ok := d.onStatsUpdate.Load().(func(*DownTrack, *livekit.AnalyticsStat)); ok && fn != nil {
+			fn(d, stat)
+		}
 	})
 
 	if d.kind == webrtc.RTPCodecTypeVideo {
@@ -1088,6 +1095,12 @@ func (d *DownTrack) WriteRTP(extPkt *buffer.ExtPacket, layer int32) int32 {
 	}
 	payload = payload[:len(tp.codecBytes)+n]
 
+	if d.params.StripPacketTrailer {
+		if strip := packettrailer.StripTrailer(payload, tp.marker); strip > 0 {
+			payload = payload[:len(payload)-strip]
+		}
+	}
+
 	// translate RTP header
 	hdr := RTPHeaderFactory.Get().(*rtp.Header)
 	*hdr = rtp.Header{
@@ -1203,6 +1216,10 @@ func (d *DownTrack) WriteRTP(extPkt *buffer.ExtPacket, layer int32) int32 {
 		if sal := d.getStreamAllocatorListener(); sal != nil {
 			sal.OnResume(d)
 		}
+	}
+
+	if tp.isStarting {
+		d.params.Listener.OnStreamStarted()
 	}
 	return 1
 }
@@ -1398,9 +1415,9 @@ func (d *DownTrack) Close() {
 	d.CloseWithFlush(true, true)
 }
 
-// CloseWithFlush - flush used to indicate whether send blank frame to flush
+// CloseWithFlush - `flush` used to indicate whether send blank frame to flush
 // decoder of client.
-//  1. When transceiver is reused by other participant's video track,
+//  1. When transceiver of this track is reused by some other participant's video track,
 //     set flush=true to avoid previous video shows before new stream is displayed.
 //  2. in case of session migration, participant migrate from other node, video track should
 //     be resumed with same participant, set flush=false since we don't need to flush decoder.
@@ -1412,7 +1429,7 @@ func (d *DownTrack) CloseWithFlush(flush bool, isEnding bool) {
 		return
 	}
 
-	d.params.Logger.Debugw("close downtrack", "flushBlankFrame", flush)
+	d.params.Logger.Debugw("close downtrack", "flushBlankFrame", flush, "isEnding", isEnding)
 	if d.bindState.Load() == bindStateBound {
 		d.forwarder.Mute(true, true)
 
@@ -1475,7 +1492,7 @@ func (d *DownTrack) CloseWithFlush(flush bool, isEnding bool) {
 	close(d.keyFrameRequesterCh)
 	d.keyFrameRequesterChMu.Unlock()
 
-	d.params.Listener.OnDownTrackClose(!isEnding)
+	d.params.Listener.OnDownTrackClose(!flush)
 }
 
 func (d *DownTrack) SetMaxSpatialLayer(spatialLayer int32) {
@@ -2005,6 +2022,7 @@ func (d *DownTrack) handleRTCP(bytes []byte) {
 				if r.SSRC != d.ssrc {
 					continue
 				}
+				rr.Reports = append(rr.Reports, r)
 
 				rtt, isRttChanged := d.rtpStats.UpdateFromReceiverReport(r)
 				if isRttChanged {
@@ -2204,6 +2222,12 @@ func (d *DownTrack) retransmitPacket(epm *extPacketMeta, sourcePkt []byte, isPro
 		copy(payload[rtxOffset:], epm.codecBytes[:epm.numCodecBytesOut])
 		copy(payload[rtxOffset+int(epm.numCodecBytesOut):], pkt.Payload[epm.numCodecBytesIn:])
 		payload = payload[:rtxOffset+int(epm.numCodecBytesOut)+len(pkt.Payload)-int(epm.numCodecBytesIn)]
+	}
+
+	if d.params.StripPacketTrailer {
+		if strip := packettrailer.StripTrailer(payload[rtxOffset:], epm.marker); strip > 0 {
+			payload = payload[:len(payload)-strip]
+		}
 	}
 
 	headerSize := hdr.MarshalSize()
@@ -2462,6 +2486,13 @@ func (d *DownTrack) DebugInfo() map[string]any {
 
 func (d *DownTrack) GetConnectionScoreAndQuality() (float32, livekit.ConnectionQuality) {
 	return d.connectionStats.GetScoreAndQuality()
+}
+
+// OnStatsUpdate registers an additional callback that fires alongside the
+// configured DownTrackListener whenever connection-quality stats are produced.
+// Intended for tests and observers; the production listener path is unaffected.
+func (d *DownTrack) OnStatsUpdate(fn func(d *DownTrack, stat *livekit.AnalyticsStat)) {
+	d.onStatsUpdate.Store(fn)
 }
 
 func (d *DownTrack) GetTrackStats() *livekit.RTPStats {
