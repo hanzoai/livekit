@@ -129,18 +129,23 @@ func NewSubscribedTrack(params SubscribedTrackParams) (*SubscribedTrack, error) 
 	if isEncrypted {
 		trailer = params.Subscriber.GetTrailer()
 	}
+	subClientInfo := ClientInfo{ClientInfo: params.Subscriber.GetClientInfo()}
+	subSupportsPacketTrailer := subClientInfo.SupportsPacketTrailer()
+	// Strip packet trailer if track has packet trailer but subscriber does not have cap
+	stripPacketTrailer := params.MediaTrack.HasPacketTrailer() && !subSupportsPacketTrailer
 	downTrack, err := sfu.NewDownTrack(sfu.DownTrackParams{
-		Codecs:            codecs,
-		IsEncrypted:       isEncrypted,
-		Source:            params.MediaTrack.Source(),
-		Receiver:          params.WrappedReceiver,
-		BufferFactory:     params.Subscriber.GetBufferFactory(),
-		SubID:             params.Subscriber.ID(),
-		StreamID:          streamID,
-		MaxTrack:          maxTrack,
-		PlayoutDelayLimit: params.Subscriber.GetPlayoutDelayConfig(),
-		Pacer:             params.Subscriber.GetPacer(),
-		Trailer:           trailer,
+		Codecs:             codecs,
+		IsEncrypted:        isEncrypted,
+		Source:             params.MediaTrack.Source(),
+		Receiver:           params.WrappedReceiver,
+		BufferFactory:      params.Subscriber.GetBufferFactory(),
+		SubID:              params.Subscriber.ID(),
+		StreamID:           streamID,
+		MaxTrack:           maxTrack,
+		PlayoutDelayLimit:  params.Subscriber.GetPlayoutDelayConfig(),
+		Pacer:              params.Subscriber.GetPacer(),
+		Trailer:            trailer,
+		StripPacketTrailer: stripPacketTrailer,
 		Logger: LoggerWithTrack(
 			params.Subscriber.GetLogger().WithComponent(sutils.ComponentSub),
 			params.MediaTrack.ID(),
@@ -226,7 +231,7 @@ func (t *SubscribedTrack) Bound(err error) {
 // for DownTrack callback to notify us that it's closed
 func (t *SubscribedTrack) Close(isExpectedToResume bool) {
 	if onClose := t.onClose.Load(); onClose != nil {
-		go onClose.(func(bool))(isExpectedToResume)
+		onClose.(func(bool))(isExpectedToResume)
 	}
 }
 
@@ -408,6 +413,8 @@ func (t *SubscribedTrack) OnStatsUpdate(stat *livekit.AnalyticsStat) {
 	if cs, ok := telemetry.CondenseStat(stat); ok {
 		ti := t.params.WrappedReceiver.TrackInfo()
 		t.reporter.Tx(func(tx roomobs.TrackTx) {
+			tx.ParticipantSession().ReportKindCode(roomobs.ParticipantKindCode(t.params.Subscriber.Kind()))
+			tx.ParticipantSession().ReportKindDetailsCodes(roomobs.ParticipantKindDetailsCodes(t.params.Subscriber.KindDetails()))
 			tx.ReportName(ti.Name)
 			tx.ReportKind(roomobs.TrackKindSub)
 			tx.ReportType(roomobs.TrackTypeFromProto(ti.Type))
@@ -472,10 +479,12 @@ func (t *SubscribedTrack) OnDownTrackClose(isExpectedToResume bool) {
 		}
 	}
 
-	go func() {
-		if t.params.OnDownTrackClosed != nil {
-			t.params.OnDownTrackClosed(t.params.Subscriber.ID())
-		}
-		t.Close(isExpectedToResume)
-	}()
+	if t.params.OnDownTrackClosed != nil {
+		t.params.OnDownTrackClosed(t.params.Subscriber.ID())
+	}
+	t.Close(isExpectedToResume)
+}
+
+func (t *SubscribedTrack) OnStreamStarted() {
+	t.params.TelemetryListener.OnTrackSubscribeStreamStarted(t.params.Subscriber.ID(), t.params.MediaTrack.ToProto())
 }

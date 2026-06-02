@@ -31,8 +31,6 @@ import (
 const (
 	cFirstPacketTimeAdjustWindow    = 2 * time.Minute
 	cFirstPacketTimeAdjustThreshold = 15 * 1e9
-
-	cSequenceNumberLargeJumpThreshold = 100
 )
 
 // -------------------------------------------------------
@@ -402,7 +400,7 @@ func (r *rtpStatsBase) maybeAdjustFirstPacketTime(
 	srData *livekit.RTCPSenderReportState,
 	tsOffset uint64,
 	extStartTS uint64,
-) (adjustment int64, err error, loggingFields []any) {
+) (adjustment int64, loggingFields []any, err error) {
 	nowNano := mono.UnixNano()
 	if time.Duration(nowNano-r.startTime) > cFirstPacketTimeAdjustWindow {
 		return
@@ -478,13 +476,13 @@ func (r *rtpStatsBase) deltaInfo(
 	snapshotID uint32,
 	extStartSN uint64,
 	extHighestSN uint64,
-) (deltaInfo *RTPDeltaInfo, err error, loggingFields []any) {
+) (deltaInfo *RTPDeltaInfo, loggingFields []any, err error) {
 	if r.clockRate == 0 {
 		return
 	}
 
-	then, now := r.getAndResetSnapshot(snapshotID, extStartSN, extHighestSN)
-	if now == nil || then == nil {
+	then, now, ok := r.getAndResetSnapshot(snapshotID, extStartSN, extHighestSN)
+	if !ok {
 		return
 	}
 
@@ -696,9 +694,9 @@ func (r *rtpStatsBase) updateJitter(ets uint64, packetTime int64) float64 {
 	return r.jitter
 }
 
-func (r *rtpStatsBase) getAndResetSnapshot(snapshotID uint32, extStartSN uint64, extHighestSN uint64) (*snapshot, *snapshot) {
+func (r *rtpStatsBase) getAndResetSnapshot(snapshotID uint32, extStartSN uint64, extHighestSN uint64) (snapshot, snapshot, bool) {
 	if !r.initialized || snapshotID < cFirstSnapshotID {
-		return nil, nil
+		return snapshot{}, snapshot{}, false
 	}
 
 	idx := snapshotID - cFirstSnapshotID
@@ -711,7 +709,7 @@ func (r *rtpStatsBase) getAndResetSnapshot(snapshotID uint32, extStartSN uint64,
 	// snapshot now
 	now := r.getSnapshot(mono.UnixNano(), extHighestSN+1)
 	r.snapshots[idx] = now
-	return &then, &now
+	return then, now, true
 }
 
 func (r *rtpStatsBase) getDrift(extStartTS, extHighestTS uint64) (

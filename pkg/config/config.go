@@ -88,6 +88,8 @@ type Config struct {
 	NodeStats NodeStatsConfig `yaml:"node_stats,omitempty"`
 
 	EnableDataTracks bool `yaml:"enable_data_tracks,omitempty"`
+
+	API APIConfig `yaml:"api,omitempty"`
 }
 
 type RTCConfig struct {
@@ -215,15 +217,27 @@ type LoggingConfig struct {
 }
 
 type TURNConfig struct {
-	Enabled             bool   `yaml:"enabled,omitempty"`
-	Domain              string `yaml:"domain,omitempty"`
-	CertFile            string `yaml:"cert_file,omitempty"`
-	KeyFile             string `yaml:"key_file,omitempty"`
-	TLSPort             int    `yaml:"tls_port,omitempty"`
-	UDPPort             int    `yaml:"udp_port,omitempty"`
-	RelayPortRangeStart uint16 `yaml:"relay_range_start,omitempty"`
-	RelayPortRangeEnd   uint16 `yaml:"relay_range_end,omitempty"`
-	ExternalTLS         bool   `yaml:"external_tls,omitempty"`
+	Enabled             bool     `yaml:"enabled,omitempty"`
+	Domain              string   `yaml:"domain,omitempty"`
+	CertFile            string   `yaml:"cert_file,omitempty"`
+	KeyFile             string   `yaml:"key_file,omitempty"`
+	TLSPort             int      `yaml:"tls_port,omitempty"`
+	UDPPort             int      `yaml:"udp_port,omitempty"`
+	RelayPortRangeStart uint16   `yaml:"relay_range_start,omitempty"`
+	RelayPortRangeEnd   uint16   `yaml:"relay_range_end,omitempty"`
+	ExternalTLS         bool     `yaml:"external_tls,omitempty"`
+	BindAddresses       []string `yaml:"bind_addresses,omitempty"`
+	// TTL of the TURN credentials in seconds - defaults to 300
+	TTLSeconds int `yaml:"ttl_seconds,omitempty"`
+	// list of restricted peer CIDRs (loopback, link-local (unicast, multicast), multicast, private, unspecified) to allow access to.
+	// By default (i. e. empty list), all restricted peer CIDRs are denied access.
+	// When not empty, only the specified CIDRs are allowed access.
+	// Note that this check is applied to restricted peer CIDRs only.
+	AllowRestrictedPeerCIDRs []string `yaml:"allow_restricted_peer_cidrs,omitempty"`
+	// list of peer CIDRs to deny access to
+	// This applies to all peer CIDRs, including restricted ones.
+	// Deny list takes precedence over allow list.
+	DenyPeerCIDRs []string `yaml:"deny_peer_cidrs,omitempty"`
 }
 
 type NodeSelectorConfig struct {
@@ -308,6 +322,9 @@ type APIConfig struct {
 
 	// max amount of time to wait before checking for operation complete
 	MaxCheckInterval time.Duration `yaml:"max_check_interval,omitempty"`
+
+	// Backwards compatibility for room service api calls, will enable by default and remove in a future release
+	EnablePsrpcForGetListParticpants bool `yaml:"enable_psrpc_for_get_list_participants,omitempty"`
 }
 
 type PrometheusConfig struct {
@@ -413,7 +430,9 @@ var DefaultConfig = Config{
 		PionLevel: "error",
 	},
 	TURN: TURNConfig{
-		Enabled: false,
+		Enabled:       false,
+		BindAddresses: []string{"0.0.0.0"},
+		TTLSeconds:    300,
 	},
 	NodeSelector: NodeSelectorConfig{
 		Kind:         "any",
@@ -429,11 +448,16 @@ var DefaultConfig = Config{
 		StreamBufferSize: 1000,
 		ConnectAttempts:  3,
 	},
-	PSRPC:     rpc.DefaultPSRPCConfig,
-	Keys:      map[string]string{},
-	Metric:    metric.DefaultMetricConfig,
-	WebHook:   webhook.DefaultWebHookConfig,
-	NodeStats: DefaultNodeStatsConfig,
+	Agents: agent.Config{
+		TargetLoad: agent.DefaultTargetLoad,
+	},
+	PSRPC:            rpc.DefaultPSRPCConfig,
+	Keys:             map[string]string{},
+	Metric:           metric.DefaultMetricConfig,
+	WebHook:          webhook.DefaultWebHookConfig,
+	NodeStats:        DefaultNodeStatsConfig,
+	API:              DefaultAPIConfig(),
+	EnableDataTracks: true,
 }
 
 func NewConfig(confString string, strictMode bool, c *cli.Command, baseFlags []cli.Flag) (*Config, error) {
@@ -628,7 +652,7 @@ func GenerateCLIFlags(existingFlags []cli.Flag, hidden bool) ([]cli.Flag, error)
 		}
 
 		var flag cli.Flag
-		envVar := fmt.Sprintf("LIVEKIT_%s", strings.ToUpper(strings.Replace(name, ".", "_", -1)))
+		envVar := fmt.Sprintf("LIVEKIT_%s", strings.ToUpper(strings.ReplaceAll(name, ".", "_")))
 		defaultText := cliDefaultText(value)
 
 		switch kind {

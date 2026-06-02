@@ -117,6 +117,7 @@ const (
 	ParticipantCloseReasonUserUnavailable
 	ParticipantCloseReasonUserRejected
 	ParticipantCloseReasonMoveFailed
+	ParticipantCloseReasonAgentError
 )
 
 func (p ParticipantCloseReason) String() string {
@@ -177,6 +178,8 @@ func (p ParticipantCloseReason) String() string {
 		return "USER_REJECTED"
 	case ParticipantCloseReasonMoveFailed:
 		return "MOVE_FAILED"
+	case ParticipantCloseReasonAgentError:
+		return "AGENT_ERROR"
 	default:
 		return fmt.Sprintf("%d", int(p))
 	}
@@ -214,10 +217,29 @@ func (p ParticipantCloseReason) ToDisconnectReason() livekit.DisconnectReason {
 		return livekit.DisconnectReason_USER_UNAVAILABLE
 	case ParticipantCloseReasonUserRejected:
 		return livekit.DisconnectReason_USER_REJECTED
+	case ParticipantCloseReasonAgentError:
+		return livekit.DisconnectReason_AGENT_ERROR
 	default:
 		// the other types will map to unknown reason
 		return livekit.DisconnectReason_UNKNOWN_REASON
 	}
+}
+
+// IsIntentionalDisconnect reports whether a disconnect reason represents an
+// intentional/expected closure (client leaving, admin action, room teardown,
+// migration, etc.) as opposed to a connection failure.
+func IsIntentionalDisconnect(reason livekit.DisconnectReason) bool {
+	switch reason {
+	case livekit.DisconnectReason_CLIENT_INITIATED,
+		livekit.DisconnectReason_SERVER_SHUTDOWN,
+		livekit.DisconnectReason_DUPLICATE_IDENTITY,
+		livekit.DisconnectReason_MIGRATION,
+		livekit.DisconnectReason_PARTICIPANT_REMOVED,
+		livekit.DisconnectReason_ROOM_DELETED,
+		livekit.DisconnectReason_ROOM_CLOSED:
+		return true
+	}
+	return false
 }
 
 // ---------------------------------------------
@@ -283,6 +305,7 @@ type Participant interface {
 	ConnectedAt() time.Time
 	CloseReason() ParticipantCloseReason
 	Kind() livekit.ParticipantInfo_Kind
+	KindDetails() []livekit.ParticipantInfo_KindDetail
 	IsRecorder() bool
 	IsDependent() bool
 	IsAgent() bool
@@ -645,7 +668,8 @@ type ParticipantTelemetryListener interface {
 	OnTrackSubscribeRequested(pID livekit.ParticipantID, ti *livekit.TrackInfo)
 	OnTrackSubscribed(pID livekit.ParticipantID, ti *livekit.TrackInfo, publisherInfo *livekit.ParticipantInfo, shouldSendEvent bool)
 	OnTrackUnsubscribed(pID livekit.ParticipantID, ti *livekit.TrackInfo, shouldSendEvent bool)
-	OnTrackSubscribeFailed(pID livekit.ParticipantID, ti livekit.TrackID, err error, isUserError bool)
+	OnTrackSubscribeFailed(pID livekit.ParticipantID, trackID livekit.TrackID, err error, isUserError bool)
+	OnTrackSubscribeStreamStarted(pID livekit.ParticipantID, ti *livekit.TrackInfo)
 	OnTrackMuted(pID livekit.ParticipantID, ti *livekit.TrackInfo)
 	OnTrackUnmuted(pID livekit.ParticipantID, ti *livekit.TrackInfo)
 	OnTrackPublishedUpdate(pID livekit.ParticipantID, ti *livekit.TrackInfo)
@@ -672,7 +696,9 @@ func (NullParticipantTelemetryListener) OnTrackSubscribed(pID livekit.Participan
 }
 func (NullParticipantTelemetryListener) OnTrackUnsubscribed(pID livekit.ParticipantID, ti *livekit.TrackInfo, shouldSendEvent bool) {
 }
-func (NullParticipantTelemetryListener) OnTrackSubscribeFailed(pID livekit.ParticipantID, ti livekit.TrackID, err error, isUserError bool) {
+func (NullParticipantTelemetryListener) OnTrackSubscribeFailed(pID livekit.ParticipantID, trackID livekit.TrackID, err error, isUserError bool) {
+}
+func (NullParticipantTelemetryListener) OnTrackSubscribeStreamStarted(pID livekit.ParticipantID, ti *livekit.TrackInfo) {
 }
 func (NullParticipantTelemetryListener) OnTrackMuted(pID livekit.ParticipantID, ti *livekit.TrackInfo) {
 }
@@ -761,6 +787,7 @@ type MediaTrack interface {
 	ClearAllReceivers(isExpectedToResume bool)
 
 	IsEncrypted() bool
+	HasPacketTrailer() bool
 }
 
 //counterfeiter:generate . LocalMediaTrack

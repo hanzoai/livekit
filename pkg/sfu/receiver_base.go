@@ -27,6 +27,7 @@ import (
 	"go.uber.org/atomic"
 
 	"github.com/livekit/mediatransportutil/pkg/bucket"
+	"github.com/livekit/mediatransportutil/pkg/codec"
 	"github.com/livekit/protocol/codecs/mime"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
@@ -116,7 +117,6 @@ type TrackReceiver interface {
 
 	SendPLI(layer int32, force bool)
 
-	SetUpTrackPaused(paused bool)
 	SetMaxExpectedSpatialLayer(layer int32)
 
 	AddDownTrack(track TrackSender) error
@@ -146,7 +146,7 @@ type TrackReceiver interface {
 	CodecState() ReceiverCodecState
 
 	// VideoSizes returns the video size parsed from rtp packet for each spatial layer.
-	VideoSizes() []buffer.VideoSize
+	VideoSizes() []codec.VideoSize
 
 	// closes all associated buffers and issues a resync to all attached downtracks so that
 	// they can resync and have proper sequncing without gaps in sequence numbers / timestamps
@@ -212,7 +212,7 @@ type ReceiverBase struct {
 	trackInfo      *livekit.TrackInfo
 
 	videoSizeMu        sync.RWMutex
-	videoSizes         [buffer.DefaultMaxLayerSpatial + 1]buffer.VideoSize
+	videoSizes         [buffer.DefaultMaxLayerSpatial + 1]codec.VideoSize
 	onVideoSizeChanged func()
 
 	rtt uint32
@@ -352,7 +352,15 @@ func (r *ReceiverBase) UpdateTrackInfo(ti *livekit.TrackInfo) {
 		)
 	}
 	r.trackInfo = utils.CloneProto(ti)
-	// MUTABLE-TRACKINFO-TODO: notify buffers, buffers may need to resize retransmission buffer if there is layer change
+
+	paused := r.trackInfo.GetMuted()
+	for _, buff := range r.buffers {
+		if buff == nil {
+			continue
+		}
+
+		buff.SetPaused(paused)
+	}
 	r.bufferMu.Unlock()
 
 	r.streamTrackerManager.UpdateTrackInfo(ti)
@@ -538,23 +546,6 @@ func (r *ReceiverBase) Kind() webrtc.RTPCodecType {
 
 func (r *ReceiverBase) StreamTrackerManager() *StreamTrackerManager {
 	return r.streamTrackerManager
-}
-
-// SetUpTrackPaused indicates upstream will not be sending any data.
-// this will reflect the "muted" status and will pause streamtracker to ensure we don't turn off
-// the layer
-func (r *ReceiverBase) SetUpTrackPaused(paused bool) {
-	r.streamTrackerManager.SetPaused(paused)
-
-	r.bufferMu.RLock()
-	for _, buff := range r.buffers {
-		if buff == nil {
-			continue
-		}
-
-		buff.SetPaused(paused)
-	}
-	r.bufferMu.RUnlock()
 }
 
 func (r *ReceiverBase) AddDownTrack(track TrackSender) error {
@@ -760,13 +751,14 @@ func (r *ReceiverBase) GetOrCreateBuffer(layer int32) buffer.BufferProvider {
 	r.bufferMu.Lock()
 	r.buffers[layer] = buff
 	rtt := r.rtt
+	paused := r.trackInfo.GetMuted()
 	r.bufferMu.Unlock()
 
-	r.setupBuffer(buff, layer, rtt)
+	r.setupBuffer(buff, layer, rtt, paused)
 	return buff
 }
 
-func (r *ReceiverBase) setupBuffer(buff buffer.BufferProvider, layer int32, rtt uint32) {
+func (r *ReceiverBase) setupBuffer(buff buffer.BufferProvider, layer int32, rtt uint32, paused bool) {
 	buff.SetLogger(r.params.Logger.WithValues("layer", layer))
 	buff.SetAudioLevelConfig(r.audioConfig.AudioLevelConfig)
 	buff.SetStreamRestartDetection(r.enableRTPStreamRestartDetection)
@@ -780,7 +772,7 @@ func (r *ReceiverBase) setupBuffer(buff buffer.BufferProvider, layer int32, rtt 
 			rt.ForwardRTCPSenderReport(r.params.Codec.PayloadType, layer, srData)
 		}
 	})
-	buff.OnVideoSizeChanged(func(videoSize []buffer.VideoSize) {
+	buff.OnVideoSizeChanged(func(videoSize []codec.VideoSize) {
 		r.videoSizeMu.Lock()
 		if r.videoLayerMode == livekit.VideoLayer_MULTIPLE_SPATIAL_LAYERS_PER_STREAM {
 			copy(r.videoSizes[:], videoSize)
@@ -818,16 +810,17 @@ func (r *ReceiverBase) setupBuffer(buff buffer.BufferProvider, layer int32, rtt 
 	}
 
 	buff.SetRTT(rtt)
-	buff.SetPaused(r.streamTrackerManager.IsPaused())
+	buff.SetPaused(paused)
 }
 
 func (r *ReceiverBase) AddBuffer(buff buffer.BufferProvider, layer int32) {
 	r.bufferMu.Lock()
 	r.buffers[layer] = buff
 	rtt := r.rtt
+	paused := r.trackInfo.GetMuted()
 	r.bufferMu.Unlock()
 
-	r.setupBuffer(buff, layer, rtt)
+	r.setupBuffer(buff, layer, rtt, paused)
 }
 
 func (r *ReceiverBase) StartBuffer(buff buffer.BufferProvider, layer int32) {
@@ -1161,10 +1154,10 @@ func (r *ReceiverBase) AddOnReady(fn func()) {
 	fn()
 }
 
-func (w *ReceiverBase) handleCodecChange(newCodec webrtc.RTPCodecParameters) {
+func (r *ReceiverBase) handleCodecChange(newCodec webrtc.RTPCodecParameters) {
 	// codec fallback is not supported mid-session, i.e. change of codec via payload type change,
 	// set the codec state to invalid once it happens
-	w.SetCodecState(ReceiverCodecStateInvalid)
+	r.SetCodecState(ReceiverCodecStateInvalid)
 }
 
 func (r *ReceiverBase) AddOnCodecStateChange(f func(webrtc.RTPCodecParameters, ReceiverCodecState)) {
@@ -1256,8 +1249,8 @@ func (r *ReceiverBase) checkCodecChanged(codec webrtc.RTPCodecParameters, header
 	}
 }
 
-func (r *ReceiverBase) VideoSizes() []buffer.VideoSize {
-	var sizes []buffer.VideoSize
+func (r *ReceiverBase) VideoSizes() []codec.VideoSize {
+	var sizes []codec.VideoSize
 	r.videoSizeMu.RLock()
 	defer r.videoSizeMu.RUnlock()
 	for _, v := range r.videoSizes {

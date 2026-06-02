@@ -16,11 +16,12 @@ package rtc
 
 import (
 	"errors"
+	"maps"
+	"slices"
 	"sync"
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
-	"golang.org/x/exp/maps"
 
 	"github.com/livekit/livekit-server/pkg/rtc/types"
 	"github.com/livekit/protocol/utils"
@@ -146,7 +147,7 @@ func (u *UpTrackManager) GetPublishedTracks() []types.MediaTrack {
 	u.lock.RLock()
 	defer u.lock.RUnlock()
 
-	return maps.Values(u.publishedTracks)
+	return slices.Collect(maps.Values(u.publishedTracks))
 }
 
 func (u *UpTrackManager) UpdateSubscriptionPermission(
@@ -310,7 +311,11 @@ func (u *UpTrackManager) parseSubscriptionPermissionsLocked(
 
 			sub := resolver(livekit.ParticipantID(trackPerms.ParticipantSid))
 			if sub == nil {
-				u.params.Logger.Warnw("could not find subscriber for permissions update", nil, "subscriberID", trackPerms.ParticipantSid)
+				u.params.Logger.Warnw(
+					"could not find subscriber for permissions update", nil,
+					"subscriberID", trackPerms.ParticipantSid,
+					"subscriptionPermission", logger.Proto(subscriptionPermission),
+				)
 				continue
 			}
 
@@ -319,10 +324,19 @@ func (u *UpTrackManager) parseSubscriptionPermissionsLocked(
 			if trackPerms.ParticipantSid != "" {
 				sub := resolver(livekit.ParticipantID(trackPerms.ParticipantSid))
 				if sub != nil && sub.Identity() != subscriberIdentity {
-					u.params.Logger.Errorw("participant identity mismatch", nil, "expected", subscriberIdentity, "got", sub.Identity())
+					u.params.Logger.Errorw(
+						"participant identity mismatch", nil,
+						"expected", subscriberIdentity,
+						"got", sub.Identity(),
+						"subscriptionPermission", logger.Proto(subscriptionPermission),
+					)
 				}
 				if sub == nil {
-					u.params.Logger.Warnw("could not find subscriber for permissions update", nil, "subscriberID", trackPerms.ParticipantSid)
+					u.params.Logger.Warnw(
+						"could not find subscriber for permissions update", nil,
+						"subscriberID", trackPerms.ParticipantSid,
+						"subscriptionPermission", logger.Proto(subscriptionPermission),
+					)
 				}
 			}
 		}

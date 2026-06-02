@@ -20,17 +20,22 @@ import (
 	"crypto/sha1"
 	"encoding/base64"
 	"fmt"
+	"maps"
+	"net"
 	"os"
+	"slices"
+	"strconv"
 	"sync"
 	"time"
 
 	"github.com/pkg/errors"
-	"golang.org/x/exp/maps"
 
 	"github.com/livekit/mediatransportutil/pkg/rtcconfig"
 	"github.com/livekit/protocol/auth"
+	"github.com/livekit/protocol/codecs/mime"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
+	"github.com/livekit/protocol/observability"
 	"github.com/livekit/protocol/observability/roomobs"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
@@ -214,7 +219,7 @@ func (r *RoomManager) deleteRoom(ctx context.Context, roomName livekit.RoomName)
 
 func (r *RoomManager) CloseIdleRooms() {
 	r.lock.RLock()
-	rooms := maps.Values(r.rooms)
+	rooms := slices.Collect(maps.Values(r.rooms))
 	r.lock.RUnlock()
 
 	for _, room := range rooms {
@@ -237,7 +242,7 @@ func (r *RoomManager) HasParticipants() bool {
 func (r *RoomManager) Stop() {
 	// disconnect all clients
 	r.lock.RLock()
-	rooms := maps.Values(r.rooms)
+	rooms := slices.Collect(maps.Values(r.rooms))
 	r.lock.RUnlock()
 
 	for _, room := range rooms {
@@ -458,6 +463,13 @@ func (r *RoomManager) StartSession(
 		subscriberAllowPause = *pi.SubscriberAllowPause
 	}
 
+	enabledCodecs := protoRoom.EnabledCodecs
+	if !slices.ContainsFunc(enabledCodecs, func(codec *livekit.Codec) bool {
+		return mime.IsMimeTypeStringRTX(codec.Mime)
+	}) {
+		enabledCodecs = append(enabledCodecs, &livekit.Codec{Mime: mime.MimeTypeRTX.String()})
+	}
+
 	participant, err = rtc.NewParticipant(rtc.ParticipantParams{
 		Identity:                pi.Identity,
 		Name:                    pi.Name,
@@ -469,12 +481,13 @@ func (r *RoomManager) StartSession(
 		LimitConfig:             r.config.Limit,
 		ProtocolVersion:         pv,
 		SessionStartTime:        sessionStartTime,
+		SessionTimer:            observability.NewSessionTimer(sessionStartTime),
 		TelemetryListener:       room.ParticipantTelemetryListener(),
 		Trailer:                 room.Trailer(),
 		PLIThrottleConfig:       r.config.RTC.PLIThrottle,
 		CongestionControlConfig: r.config.RTC.CongestionControl,
-		PublishEnabledCodecs:    protoRoom.EnabledCodecs,
-		SubscribeEnabledCodecs:  protoRoom.EnabledCodecs,
+		PublishEnabledCodecs:    enabledCodecs,
+		SubscribeEnabledCodecs:  enabledCodecs,
 		Grants:                  pi.Grants,
 		Reconnect:               pi.Reconnect,
 		Logger:                  pLogger,
@@ -774,6 +787,37 @@ func (r *RoomManager) roomAndParticipantForReq(ctx context.Context, req particip
 	return room, participant, nil
 }
 
+func (r *RoomManager) ListParticipants(ctx context.Context, req *livekit.ListParticipantsRequest) (*livekit.ListParticipantsResponse, error) {
+	room := r.GetRoom(ctx, livekit.RoomName(req.Room))
+	if room == nil {
+		return nil, ErrRoomNotFound
+	}
+
+	participants := room.GetParticipants()
+	items := make([]*livekit.ParticipantInfo, 0, len(participants))
+	for _, p := range participants {
+		items = append(items, p.ToProto())
+	}
+
+	return &livekit.ListParticipantsResponse{
+		Participants: items,
+	}, nil
+}
+
+func (r *RoomManager) GetParticipant(ctx context.Context, req *livekit.RoomParticipantIdentity) (*livekit.ParticipantInfo, error) {
+	room := r.GetRoom(ctx, livekit.RoomName(req.Room))
+	if room == nil {
+		return nil, ErrRoomNotFound
+	}
+
+	participant := room.GetParticipant(livekit.ParticipantIdentity(req.Identity))
+	if participant == nil {
+		return nil, ErrParticipantNotFound
+	}
+
+	return participant.ToProto(), nil
+}
+
 func (r *RoomManager) RemoveParticipant(ctx context.Context, req *livekit.RoomParticipantIdentity) (*livekit.RemoveParticipantResponse, error) {
 	room, participant, err := r.roomAndParticipantForReq(ctx, req)
 	if err != nil {
@@ -992,14 +1036,16 @@ func (r *RoomManager) iceServersForParticipant(apiKey string, participant types.
 		if r.config.TURN.UDPPort > 0 && !tlsOnly {
 			// UDP TURN is used as STUN
 			hasSTUN = true
-			urls = append(urls, fmt.Sprintf("turn:%s:%d?transport=udp", r.config.RTC.NodeIP, r.config.TURN.UDPPort))
+			for _, ip := range r.config.RTC.NodeIP.ToStringSlice() {
+				urls = append(urls, fmt.Sprintf("turn:%s?transport=udp", net.JoinHostPort(ip, strconv.Itoa(int(r.config.TURN.UDPPort)))))
+			}
 		}
 		if r.config.TURN.TLSPort > 0 {
 			urls = append(urls, fmt.Sprintf("turns:%s:443?transport=tcp", r.config.TURN.Domain))
 		}
 		if len(urls) > 0 {
-			username := r.turnAuthHandler.CreateUsername(apiKey, participant.ID())
-			password, err := r.turnAuthHandler.CreatePassword(apiKey, participant.ID())
+			username, expiry := r.turnAuthHandler.CreateUsername(apiKey, participant.ID(), r.config.TURN.TTLSeconds)
+			password, err := r.turnAuthHandler.CreatePassword(apiKey, participant.ID(), expiry)
 			if err != nil {
 				participant.GetLogger().Warnw("could not create turn password", err)
 				hasSTUN = false

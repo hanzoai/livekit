@@ -310,7 +310,7 @@ func coalesce(stats []*livekit.AnalyticsStat) *livekit.AnalyticsStat {
 
 	stat := &livekit.AnalyticsStat{
 		MinScore:    minScore,
-		MedianScore: utils.MedianFloat32(scores),
+		MedianScore: utils.Median(scores),
 		Streams:     []*livekit.AnalyticsStream{coalescedStream},
 		Mime:        stats[len(stats)-1].Mime, // use the latest Mime
 	}
@@ -348,7 +348,9 @@ func CondenseStat(stat *livekit.AnalyticsStat) (ps CondensedStat, ok bool) {
 		ps.Bytes += stream.PrimaryBytes
 		ps.Packets += stream.PrimaryPackets
 		ps.PacketsLost += stream.PacketsLost
-		ps.Frames += stream.Frames
+		if stream.Frames > ps.Frames {
+			ps.Frames = stream.Frames
+		}
 	}
 
 	return
