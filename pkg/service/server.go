@@ -27,8 +27,8 @@ import (
 	"strconv"
 	"time"
 
+	metric "github.com/luxfi/metric"
 	"github.com/pion/turn/v5"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/rs/cors"
 	"github.com/twitchtv/twirp"
 	"github.com/urfave/negroni/v3"
@@ -159,7 +159,7 @@ func NewLivekitServer(conf *config.Config,
 	}
 
 	if conf.Prometheus.Port > 0 {
-		promHandler := promhttp.Handler()
+		promHandler := metric.NewHTTPHandler(metric.DefaultGatherer, metric.HandlerOpts{})
 		if conf.Prometheus.Username != "" && conf.Prometheus.Password != "" {
 			protectedHandler := negroni.New()
 			protectedHandler.Use(negroni.HandlerFunc(GenBasicAuthMiddleware(conf.Prometheus.Username, conf.Prometheus.Password)))

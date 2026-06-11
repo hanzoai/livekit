@@ -18,7 +18,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
+	metric "github.com/luxfi/metric"
 	"go.uber.org/atomic"
 
 	"github.com/livekit/protocol/livekit"
@@ -39,96 +39,96 @@ var (
 	// success rate by subtracting this from total attempts
 	trackSubscribeUserError atomic.Int32
 
-	promRoomCurrent            prometheus.Gauge
-	promRoomDuration           prometheus.Histogram
-	promParticipantCurrent     prometheus.Gauge
-	promTrackPublishedCurrent  *prometheus.GaugeVec
-	promTrackSubscribedCurrent *prometheus.GaugeVec
-	promTrackPublishCounter    *prometheus.CounterVec
-	promTrackSubscribeCounter  *prometheus.CounterVec
-	promSessionStartTime       *prometheus.HistogramVec
-	promSessionDuration        *prometheus.HistogramVec
-	promPubSubTime             *prometheus.HistogramVec
+	promRoomCurrent            metric.Gauge
+	promRoomDuration           metric.Histogram
+	promParticipantCurrent     metric.Gauge
+	promTrackPublishedCurrent  *metric.GaugeVec
+	promTrackSubscribedCurrent *metric.GaugeVec
+	promTrackPublishCounter    *metric.CounterVec
+	promTrackSubscribeCounter  *metric.CounterVec
+	promSessionStartTime       *metric.HistogramVec
+	promSessionDuration        *metric.HistogramVec
+	promPubSubTime             *metric.HistogramVec
 )
 
 func initRoomStats(nodeID string, nodeType livekit.NodeType) {
-	promRoomCurrent = prometheus.NewGauge(prometheus.GaugeOpts{
+	promRoomCurrent = metric.NewGauge(metric.GaugeOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "room",
 		Name:        "total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	})
-	promRoomDuration = prometheus.NewHistogram(prometheus.HistogramOpts{
+	promRoomDuration = metric.NewHistogram(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "room",
 		Name:        "duration_seconds",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets: []float64{
 			5, 10, 60, 5 * 60, 10 * 60, 30 * 60, 60 * 60, 2 * 60 * 60, 5 * 60 * 60, 10 * 60 * 60,
 		},
 	})
-	promParticipantCurrent = prometheus.NewGauge(prometheus.GaugeOpts{
+	promParticipantCurrent = metric.NewGauge(metric.GaugeOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "participant",
 		Name:        "total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	})
-	promTrackPublishedCurrent = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	promTrackPublishedCurrent = metric.NewGaugeVec(metric.GaugeOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "track",
 		Name:        "published_total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, []string{"kind"})
-	promTrackSubscribedCurrent = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	promTrackSubscribedCurrent = metric.NewGaugeVec(metric.GaugeOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "track",
 		Name:        "subscribed_total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, []string{"kind"})
-	promTrackPublishCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
+	promTrackPublishCounter = metric.NewCounterVec(metric.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "track",
 		Name:        "publish_counter",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, []string{"kind", "state"})
-	promTrackSubscribeCounter = prometheus.NewCounterVec(prometheus.CounterOpts{
+	promTrackSubscribeCounter = metric.NewCounterVec(metric.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "track",
 		Name:        "subscribe_counter",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, []string{"state", "error"})
-	promSessionStartTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	promSessionStartTime = metric.NewHistogramVec(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "session",
 		Name:        "start_time_ms",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
-		Buckets:     prometheus.ExponentialBucketsRange(100, 10000, 15),
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		Buckets:     metric.ExponentialBucketsRange(100, 10000, 15),
 	}, []string{"protocol_version"})
-	promSessionDuration = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	promSessionDuration = metric.NewHistogramVec(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "session",
 		Name:        "duration_ms",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
-		Buckets:     prometheus.ExponentialBucketsRange(100, 4*60*60*1000, 15),
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		Buckets:     metric.ExponentialBucketsRange(100, 4*60*60*1000, 15),
 	}, []string{"protocol_version"})
-	promPubSubTime = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	promPubSubTime = metric.NewHistogramVec(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "pubsubtime",
 		Name:        "ms",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets:     []float64{100, 200, 500, 700, 1000, 5000, 10000},
 	}, append(promStreamLabels, "sdk", "kind", "count"))
 
-	prometheus.MustRegister(promRoomCurrent)
-	prometheus.MustRegister(promRoomDuration)
-	prometheus.MustRegister(promParticipantCurrent)
-	prometheus.MustRegister(promTrackPublishedCurrent)
-	prometheus.MustRegister(promTrackSubscribedCurrent)
-	prometheus.MustRegister(promTrackPublishCounter)
-	prometheus.MustRegister(promTrackSubscribeCounter)
-	prometheus.MustRegister(promSessionStartTime)
-	prometheus.MustRegister(promSessionDuration)
-	prometheus.MustRegister(promPubSubTime)
+	metric.MustRegister(promRoomCurrent)
+	metric.MustRegister(promRoomDuration)
+	metric.MustRegister(promParticipantCurrent)
+	metric.MustRegister(promTrackPublishedCurrent)
+	metric.MustRegister(promTrackSubscribedCurrent)
+	metric.MustRegister(promTrackPublishCounter)
+	metric.MustRegister(promTrackSubscribeCounter)
+	metric.MustRegister(promSessionStartTime)
+	metric.MustRegister(promSessionDuration)
+	metric.MustRegister(promPubSubTime)
 }
 
 func RoomStarted() {

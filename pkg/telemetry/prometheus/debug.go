@@ -15,24 +15,24 @@
 package prometheus
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
+	metric "github.com/luxfi/metric"
 
 	"github.com/livekit/protocol/livekit"
 )
 
 var (
-	refCounts *prometheus.GaugeVec
+	refCounts *metric.GaugeVec
 )
 
 func initDebugStats(nodeID string, nodeType livekit.NodeType) {
-	refCounts = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	refCounts = metric.NewGaugeVec(metric.GaugeOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "debug",
 		Name:        "ref_count",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, []string{"referrer"})
 
-	prometheus.MustRegister(refCounts)
+	metric.MustRegister(refCounts)
 }
 
 func AddRef(referrer string, n int) {
