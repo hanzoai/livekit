@@ -15,7 +15,7 @@
 package prometheus
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
+	metric "github.com/luxfi/metric"
 	"go.uber.org/atomic"
 
 	"github.com/livekit/protocol/livekit"
@@ -51,127 +51,127 @@ var (
 	forwardJitter              atomic.Uint32
 
 	promPacketLabels          = []string{"direction", "transmission", "country"}
-	promPacketTotal           *prometheus.CounterVec
-	promPacketBytes           *prometheus.CounterVec
+	promPacketTotal           *metric.CounterVec
+	promPacketBytes           *metric.CounterVec
 	promRTCPLabels            = []string{"direction", "country"}
 	promStreamLabels          = []string{"direction", "source", "type", "country"}
-	promNackTotal             *prometheus.CounterVec
-	promPliTotal              *prometheus.CounterVec
-	promFirTotal              *prometheus.CounterVec
-	promPacketLossTotal       *prometheus.CounterVec
-	promPacketLoss            *prometheus.HistogramVec
-	promPacketOutOfOrderTotal *prometheus.CounterVec
-	promPacketOutOfOrder      *prometheus.HistogramVec
-	promJitter                *prometheus.HistogramVec
-	promRTT                   *prometheus.HistogramVec
-	promParticipantJoin       *prometheus.CounterVec
-	promConnections           *prometheus.GaugeVec
-	promForwardLatency        prometheus.Gauge
-	promForwardJitter         prometheus.Gauge
-	promForwardLatencyHist    prometheus.Histogram
+	promNackTotal             *metric.CounterVec
+	promPliTotal              *metric.CounterVec
+	promFirTotal              *metric.CounterVec
+	promPacketLossTotal       *metric.CounterVec
+	promPacketLoss            *metric.HistogramVec
+	promPacketOutOfOrderTotal *metric.CounterVec
+	promPacketOutOfOrder      *metric.HistogramVec
+	promJitter                *metric.HistogramVec
+	promRTT                   *metric.HistogramVec
+	promParticipantJoin       *metric.CounterVec
+	promConnections           *metric.GaugeVec
+	promForwardLatency        metric.Gauge
+	promForwardJitter         metric.Gauge
+	promForwardLatencyHist    metric.Histogram
 )
 
 func initPacketStats(nodeID string, nodeType livekit.NodeType) {
-	promPacketTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	promPacketTotal = metric.NewCounterVec(metric.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "packet",
 		Name:        "total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, promPacketLabels)
-	promPacketBytes = prometheus.NewCounterVec(prometheus.CounterOpts{
+	promPacketBytes = metric.NewCounterVec(metric.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "packet",
 		Name:        "bytes",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, promPacketLabels)
-	promNackTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	promNackTotal = metric.NewCounterVec(metric.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "nack",
 		Name:        "total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, promRTCPLabels)
-	promPliTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	promPliTotal = metric.NewCounterVec(metric.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "pli",
 		Name:        "total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, promRTCPLabels)
-	promFirTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	promFirTotal = metric.NewCounterVec(metric.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "fir",
 		Name:        "total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, promRTCPLabels)
-	promPacketLossTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	promPacketLossTotal = metric.NewCounterVec(metric.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "packet_loss",
 		Name:        "total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, promStreamLabels)
-	promPacketLoss = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	promPacketLoss = metric.NewHistogramVec(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "packet_loss",
 		Name:        "percent",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets:     []float64{0.0, 0.1, 0.3, 0.5, 0.7, 1, 5, 10, 40, 100},
 	}, promStreamLabels)
-	promPacketOutOfOrderTotal = prometheus.NewCounterVec(prometheus.CounterOpts{
+	promPacketOutOfOrderTotal = metric.NewCounterVec(metric.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "packet_out_of_order",
 		Name:        "total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, promStreamLabels)
-	promPacketOutOfOrder = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	promPacketOutOfOrder = metric.NewHistogramVec(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "packet_out_of_order",
 		Name:        "percent",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets:     []float64{0.0, 0.1, 0.3, 0.5, 0.7, 1, 5, 10, 40, 100},
 	}, promStreamLabels)
-	promJitter = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	promJitter = metric.NewHistogramVec(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "jitter",
 		Name:        "us",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		// 1ms, 10ms, 30ms, 50ms, 70ms, 100ms, 300ms, 600ms, 1s
 		Buckets: []float64{1000, 10000, 30000, 50000, 70000, 100000, 300000, 600000, 1000000},
 	}, promStreamLabels)
-	promRTT = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	promRTT = metric.NewHistogramVec(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "rtt",
 		Name:        "ms",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets:     []float64{50, 100, 150, 200, 250, 500, 750, 1000, 5000, 10000},
 	}, promStreamLabels)
-	promParticipantJoin = prometheus.NewCounterVec(prometheus.CounterOpts{
+	promParticipantJoin = metric.NewCounterVec(metric.CounterOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "participant_join",
 		Name:        "total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, []string{"state"})
-	promConnections = prometheus.NewGaugeVec(prometheus.GaugeOpts{
+	promConnections = metric.NewGaugeVec(metric.GaugeOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "connection",
 		Name:        "total",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, []string{"kind"})
-	promForwardLatency = prometheus.NewGauge(prometheus.GaugeOpts{
+	promForwardLatency = metric.NewGauge(metric.GaugeOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "forward",
 		Name:        "latency",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	})
-	promForwardJitter = prometheus.NewGauge(prometheus.GaugeOpts{
+	promForwardJitter = metric.NewGauge(metric.GaugeOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "forward",
 		Name:        "jitter",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	})
-	promForwardLatencyHist = prometheus.NewHistogram(prometheus.HistogramOpts{
+	promForwardLatencyHist = metric.NewHistogram(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "forward_latency",
 		Name:        "ns",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		// 50us, 100us, 250us, 500us, 1ms, 2ms, 3ms, 5ms, 10ms, 20ms
 		Buckets: []float64{
 			50 * 1000,
@@ -187,22 +187,22 @@ func initPacketStats(nodeID string, nodeType livekit.NodeType) {
 		},
 	})
 
-	prometheus.MustRegister(promPacketTotal)
-	prometheus.MustRegister(promPacketBytes)
-	prometheus.MustRegister(promNackTotal)
-	prometheus.MustRegister(promPliTotal)
-	prometheus.MustRegister(promFirTotal)
-	prometheus.MustRegister(promPacketLossTotal)
-	prometheus.MustRegister(promPacketLoss)
-	prometheus.MustRegister(promPacketOutOfOrderTotal)
-	prometheus.MustRegister(promPacketOutOfOrder)
-	prometheus.MustRegister(promJitter)
-	prometheus.MustRegister(promRTT)
-	prometheus.MustRegister(promParticipantJoin)
-	prometheus.MustRegister(promConnections)
-	prometheus.MustRegister(promForwardLatency)
-	prometheus.MustRegister(promForwardJitter)
-	prometheus.MustRegister(promForwardLatencyHist)
+	metric.MustRegister(promPacketTotal)
+	metric.MustRegister(promPacketBytes)
+	metric.MustRegister(promNackTotal)
+	metric.MustRegister(promPliTotal)
+	metric.MustRegister(promFirTotal)
+	metric.MustRegister(promPacketLossTotal)
+	metric.MustRegister(promPacketLoss)
+	metric.MustRegister(promPacketOutOfOrderTotal)
+	metric.MustRegister(promPacketOutOfOrder)
+	metric.MustRegister(promJitter)
+	metric.MustRegister(promRTT)
+	metric.MustRegister(promParticipantJoin)
+	metric.MustRegister(promConnections)
+	metric.MustRegister(promForwardLatency)
+	metric.MustRegister(promForwardJitter)
+	metric.MustRegister(promForwardLatencyHist)
 }
 
 func IncrementPackets(country string, direction Direction, count uint64, retransmit bool) {

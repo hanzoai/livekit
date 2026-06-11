@@ -18,7 +18,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/prometheus/client_golang/prometheus"
+	metric "github.com/luxfi/metric"
 
 	"github.com/livekit/protocol/livekit"
 )
@@ -27,28 +27,28 @@ var (
 	promDataPacketStreamLabels    = []string{"type", "mime_type"}
 	promDataPacketStreamMimeTypes = []string{"text", "image", "application", "audio", "video"}
 
-	promDataPacketStreamDestCount *prometheus.HistogramVec
-	promDataPacketStreamSize      *prometheus.HistogramVec
+	promDataPacketStreamDestCount *metric.HistogramVec
+	promDataPacketStreamSize      *metric.HistogramVec
 )
 
 func initDataPacketStats(nodeID string, nodeType livekit.NodeType) {
-	promDataPacketStreamDestCount = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	promDataPacketStreamDestCount = metric.NewHistogramVec(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "datapacket_stream",
 		Name:        "dest_count",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets:     []float64{1, 2, 3, 4, 5, 10, 15, 25, 50},
 	}, promDataPacketStreamLabels)
-	promDataPacketStreamSize = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	promDataPacketStreamSize = metric.NewHistogramVec(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "datapacket_stream",
 		Name:        "bytes",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets:     []float64{128, 512, 2048, 8192, 32768, 131072, 524288, 2097152, 8388608, 33554432},
 	}, promDataPacketStreamLabels)
 
-	prometheus.MustRegister(promDataPacketStreamDestCount)
-	prometheus.MustRegister(promDataPacketStreamSize)
+	metric.MustRegister(promDataPacketStreamDestCount)
+	metric.MustRegister(promDataPacketStreamSize)
 }
 
 func RecordDataPacketStream(h *livekit.DataStream_Header, destCount int) {
