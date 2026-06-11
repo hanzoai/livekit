@@ -17,7 +17,7 @@ package prometheus
 import (
 	"time"
 
-	"github.com/prometheus/client_golang/prometheus"
+	metric "github.com/luxfi/metric"
 	"github.com/twitchtv/twirp"
 	"go.uber.org/atomic"
 
@@ -34,14 +34,14 @@ const (
 var (
 	initialized atomic.Bool
 
-	promMessageCounter            *prometheus.CounterVec
-	promServiceOperationCounter   *prometheus.CounterVec
-	promTwirpRequestStatusCounter *prometheus.CounterVec
-	promTwirpRequestLatency       *prometheus.HistogramVec
+	promMessageCounter            *metric.CounterVec
+	promServiceOperationCounter   *metric.CounterVec
+	promTwirpRequestStatusCounter *metric.CounterVec
+	promTwirpRequestLatency       *metric.HistogramVec
 
 	sysPacketsStart        uint32
 	sysDroppedPacketsStart uint32
-	promSysPacketGauge     *prometheus.GaugeVec
+	promSysPacketGauge     *metric.GaugeVec
 
 	cpuStats    *hwstats.CPUStats
 	memoryStats *hwstats.MemoryStats
@@ -52,70 +52,70 @@ func Init(nodeID string, nodeType livekit.NodeType) error {
 		return nil
 	}
 
-	promMessageCounter = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
+	promMessageCounter = metric.NewCounterVec(
+		metric.CounterOpts{
 			Namespace:   livekitNamespace,
 			Subsystem:   "node",
 			Name:        "messages",
-			ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+			ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		},
 		[]string{"type", "status", "direction"},
 	)
 
-	promServiceOperationCounter = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
+	promServiceOperationCounter = metric.NewCounterVec(
+		metric.CounterOpts{
 			Namespace:   livekitNamespace,
 			Subsystem:   "node",
 			Name:        "service_operation",
-			ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+			ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		},
 		[]string{"type", "status", "error_type"},
 	)
 
-	promTwirpRequestStatusCounter = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
+	promTwirpRequestStatusCounter = metric.NewCounterVec(
+		metric.CounterOpts{
 			Namespace:   livekitNamespace,
 			Subsystem:   "node",
 			Name:        "twirp_request_status",
-			ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+			ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		},
 		[]string{"service", "method", "status", "code"},
 	)
 
-	promTwirpRequestLatency = prometheus.NewHistogramVec(
-		prometheus.HistogramOpts{
+	promTwirpRequestLatency = metric.NewHistogramVec(
+		metric.HistogramOpts{
 			Namespace:   livekitNamespace,
 			Subsystem:   "node",
 			Name:        "twirp_request_latency_ms",
-			ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+			ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 			Buckets:     []float64{5, 10, 25, 50, 100, 250, 500, 1000, 2500, 5000, 10000, 30000, 60000},
 		},
 		[]string{"service", "method"},
 	)
 
-	promSysPacketGauge = prometheus.NewGaugeVec(
-		prometheus.GaugeOpts{
+	promSysPacketGauge = metric.NewGaugeVec(
+		metric.GaugeOpts{
 			Namespace:   livekitNamespace,
 			Subsystem:   "node",
 			Name:        "packet_total",
-			ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+			ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 			Help:        "System level packet count. Count starts at 0 when service is first started.",
 		},
 		[]string{"type"},
 	)
 
-	prometheus.MustRegister(promMessageCounter)
-	prometheus.MustRegister(promServiceOperationCounter)
-	prometheus.MustRegister(promTwirpRequestStatusCounter)
-	prometheus.MustRegister(promTwirpRequestLatency)
-	prometheus.MustRegister(promSysPacketGauge)
+	metric.MustRegister(promMessageCounter)
+	metric.MustRegister(promServiceOperationCounter)
+	metric.MustRegister(promTwirpRequestStatusCounter)
+	metric.MustRegister(promTwirpRequestLatency)
+	metric.MustRegister(promSysPacketGauge)
 
 	sysPacketsStart, sysDroppedPacketsStart, _ = getTCStats()
 
 	initPacketStats(nodeID, nodeType)
 	initRoomStats(nodeID, nodeType)
-	rpc.InitPSRPCStats(prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()})
-	webhook.InitWebhookStats(prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()})
+	rpc.InitPSRPCStats(metric.Labels{"node_id": nodeID, "node_type": nodeType.String()})
+	webhook.InitWebhookStats(metric.Labels{"node_id": nodeID, "node_type": nodeType.String()})
 	initQualityStats(nodeID, nodeType)
 	initDataPacketStats(nodeID, nodeType)
 	initDebugStats(nodeID, nodeType)

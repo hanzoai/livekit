@@ -15,34 +15,34 @@
 package prometheus
 
 import (
-	"github.com/prometheus/client_golang/prometheus"
+	metric "github.com/luxfi/metric"
 
 	"github.com/livekit/protocol/livekit"
 )
 
 var (
-	qualityRating prometheus.Histogram
-	qualityScore  prometheus.Histogram
+	qualityRating metric.Histogram
+	qualityScore  metric.Histogram
 )
 
 func initQualityStats(nodeID string, nodeType livekit.NodeType) {
-	qualityRating = prometheus.NewHistogram(prometheus.HistogramOpts{
+	qualityRating = metric.NewHistogram(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "quality",
 		Name:        "rating",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets:     []float64{0, 1, 2},
 	})
-	qualityScore = prometheus.NewHistogram(prometheus.HistogramOpts{
+	qualityScore = metric.NewHistogram(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "quality",
 		Name:        "score",
-		ConstLabels: prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()},
+		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets:     []float64{1.0, 2.0, 2.5, 3.0, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5},
 	})
 
-	prometheus.MustRegister(qualityRating)
-	prometheus.MustRegister(qualityScore)
+	metric.MustRegister(qualityRating)
+	metric.MustRegister(qualityScore)
 }
 
 func RecordQuality(rating livekit.ConnectionQuality, score float32) {
