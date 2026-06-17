@@ -1,4 +1,4 @@
-# livekit — AI Assistant Context
+# livekit
 
 <!--BEGIN_BANNER_IMAGE-->
 
