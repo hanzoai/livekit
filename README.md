@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/hero.svg" alt="livekit" width="880"></p>
+
 <!--BEGIN_BANNER_IMAGE-->
 
 <picture>
