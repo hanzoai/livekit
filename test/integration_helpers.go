@@ -299,8 +299,8 @@ func createRTCClientWithToken(token string, port int, testRTCServicePath testRTC
 	return c
 }
 
-func redisClient() *redis.Client {
-	return redis.NewClient(&redis.Options{
+func redisClient() *kv.Client {
+	return kv.NewClient(&kv.Options{
 		Addr: "localhost:6379",
 	})
 }

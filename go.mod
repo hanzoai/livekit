@@ -15,8 +15,8 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.7.0
 	github.com/gorilla/websocket v1.5.3
-	github.com/hanzoai/psrpc v0.7.3
-	github.com/hanzokv/go/v9 v9.21.1
+	github.com/hanzoai/psrpc v0.7.4
+	github.com/hanzokv/go/v9 v9.22.0
 	github.com/hashicorp/go-version v1.8.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jellydator/ttlcache/v3 v3.4.0

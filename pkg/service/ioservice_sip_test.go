@@ -28,7 +28,7 @@ import (
 
 func ioStoreDocker(t testing.TB) (*service.IOInfoService, *service.RedisStore) {
 	r := redisClientDocker(t)
-	bus := psrpc.NewRedisMessageBus(r)
+	bus := psrpc.NewKVMessageBus(r)
 	rs := service.NewRedisStore(r)
 	io, err := service.NewIOInfoService(bus, rs, rs, rs, nil)
 	require.NoError(t, err)

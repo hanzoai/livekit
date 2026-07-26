@@ -28,9 +28,9 @@ import (
 	"github.com/hanzoai/livekit/pkg/service"
 )
 
-func redisClientDocker(t testing.TB) *redis.Client {
+func redisClientDocker(t testing.TB) *kv.Client {
 	addr := runRedis(t)
-	cli := redis.NewClient(&redis.Options{
+	cli := kv.NewClient(&kv.Options{
 		Addr: addr,
 	})
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -46,8 +46,8 @@ func redisClientDocker(t testing.TB) *redis.Client {
 	return cli
 }
 
-func redisClient(t testing.TB) *redis.Client {
-	cli := redis.NewClient(&redis.Options{
+func redisClient(t testing.TB) *kv.Client {
+	cli := kv.NewClient(&kv.Options{
 		Addr: "localhost:6379",
 	})
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

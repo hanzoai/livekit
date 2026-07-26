@@ -22,17 +22,17 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hanzokv/go/v9"
 	goversion "github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
-	"github.com/hanzokv/go/v9"
 	"google.golang.org/protobuf/proto"
 
+	"github.com/hanzoai/psrpc"
 	"github.com/livekit/protocol/ingress"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
-	"github.com/hanzoai/psrpc"
 
 	"github.com/hanzoai/livekit/version"
 )
@@ -71,13 +71,13 @@ const (
 var _ OSSServiceStore = (*RedisStore)(nil)
 
 type RedisStore struct {
-	rc           redis.UniversalClient
-	unlockScript *redis.Script
+	rc           kv.UniversalClient
+	unlockScript *kv.Script
 	ctx          context.Context
 	done         chan struct{}
 }
 
-func NewRedisStore(rc redis.UniversalClient) *RedisStore {
+func NewRedisStore(rc kv.UniversalClient) *RedisStore {
 	unlockScript := `if redis.call("get", KEYS[1]) == ARGV[1] then
 						return redis.call("del", KEYS[1])
 					 else return 0
@@ -86,7 +86,7 @@ func NewRedisStore(rc redis.UniversalClient) *RedisStore {
 	return &RedisStore{
 		ctx:          context.Background(),
 		rc:           rc,
-		unlockScript: redis.NewScript(unlockScript),
+		unlockScript: kv.NewScript(unlockScript),
 	}
 }
 
@@ -98,7 +98,7 @@ func (s *RedisStore) Start() error {
 	s.done = make(chan struct{}, 1)
 
 	v, err := s.rc.Get(s.ctx, VersionKey).Result()
-	if err != nil && err != redis.Nil {
+	if err != nil && err != kv.Nil {
 		return err
 	}
 	if v == "" {
@@ -164,15 +164,15 @@ func (s *RedisStore) LoadRoom(_ context.Context, roomName livekit.RoomName, incl
 	}
 
 	res, err := pp.Exec(s.ctx)
-	if err != nil && err != redis.Nil {
-		// if the room exists but internal does not, the pipeline will still return redis.Nil
+	if err != nil && err != kv.Nil {
+		// if the room exists but internal does not, the pipeline will still return kv.Nil
 		return nil, nil, err
 	}
 
 	room := &livekit.Room{}
-	roomData, err := res[0].(*redis.StringCmd).Result()
+	roomData, err := res[0].(*kv.StringCmd).Result()
 	if err != nil {
-		if err == redis.Nil {
+		if err == kv.Nil {
 			err = ErrRoomNotFound
 		}
 		return nil, nil, err
@@ -183,13 +183,13 @@ func (s *RedisStore) LoadRoom(_ context.Context, roomName livekit.RoomName, incl
 
 	var internal *livekit.RoomInternal
 	if includeInternal {
-		internalData, err := res[1].(*redis.StringCmd).Result()
+		internalData, err := res[1].(*kv.StringCmd).Result()
 		if err == nil {
 			internal = &livekit.RoomInternal{}
 			if err = proto.Unmarshal([]byte(internalData), internal); err != nil {
 				return nil, nil, err
 			}
-		} else if err != redis.Nil {
+		} else if err != kv.Nil {
 			return nil, nil, err
 		}
 	}
@@ -212,14 +212,14 @@ func (s *RedisStore) ListRooms(_ context.Context, roomNames []livekit.RoomName) 
 	var err error
 	if roomNames == nil {
 		items, err = s.rc.HVals(s.ctx, RoomsKey).Result()
-		if err != nil && err != redis.Nil {
+		if err != nil && err != kv.Nil {
 			return nil, errors.Wrap(err, "could not get rooms")
 		}
 	} else {
 		names := livekit.IDsAsStrings(roomNames)
 		var results []any
 		results, err = s.rc.HMGet(s.ctx, RoomsKey, names...).Result()
-		if err != nil && err != redis.Nil {
+		if err != nil && err != kv.Nil {
 			return nil, errors.Wrap(err, "could not get rooms by names")
 		}
 		for _, r := range results {
@@ -313,7 +313,7 @@ func (s *RedisStore) StoreParticipant(_ context.Context, roomName livekit.RoomNa
 func (s *RedisStore) LoadParticipant(_ context.Context, roomName livekit.RoomName, identity livekit.ParticipantIdentity) (*livekit.ParticipantInfo, error) {
 	key := RoomParticipantsPrefix + string(roomName)
 	data, err := s.rc.HGet(s.ctx, key, string(identity)).Result()
-	if err == redis.Nil {
+	if err == kv.Nil {
 		return nil, ErrParticipantNotFound
 	} else if err != nil {
 		return nil, err
@@ -334,7 +334,7 @@ func (s *RedisStore) HasParticipant(ctx context.Context, roomName livekit.RoomNa
 func (s *RedisStore) ListParticipants(_ context.Context, roomName livekit.RoomName) ([]*livekit.ParticipantInfo, error) {
 	key := RoomParticipantsPrefix + string(roomName)
 	items, err := s.rc.HVals(s.ctx, key).Result()
-	if err == redis.Nil {
+	if err == kv.Nil {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
@@ -384,7 +384,7 @@ func (s *RedisStore) LoadEgress(_ context.Context, egressID string) (*livekit.Eg
 		}
 		return info, nil
 
-	case redis.Nil:
+	case kv.Nil:
 		return nil, ErrEgressNotFound
 
 	default:
@@ -398,7 +398,7 @@ func (s *RedisStore) ListEgress(_ context.Context, roomName livekit.RoomName, ac
 	if roomName == "" {
 		data, err := s.rc.HGetAll(s.ctx, EgressKey).Result()
 		if err != nil {
-			if err == redis.Nil {
+			if err == kv.Nil {
 				return nil, nil
 			}
 			return nil, err
@@ -419,7 +419,7 @@ func (s *RedisStore) ListEgress(_ context.Context, roomName livekit.RoomName, ac
 	} else {
 		egressIDs, err := s.rc.SMembers(s.ctx, RoomEgressPrefix+string(roomName)).Result()
 		if err != nil {
-			if err == redis.Nil {
+			if err == kv.Nil {
 				return nil, nil
 			}
 			return nil, err
@@ -488,7 +488,7 @@ func (s *RedisStore) egressWorker() {
 
 func (s *RedisStore) CleanEndedEgress() error {
 	values, err := s.rc.HGetAll(s.ctx, EndedEgressKey).Result()
-	if err != nil && err != redis.Nil {
+	if err != nil && err != kv.Nil {
 		return err
 	}
 
@@ -557,7 +557,7 @@ func (s *RedisStore) storeIngress(_ context.Context, info *livekit.IngressInfo) 
 	}
 
 	// Use a "transaction" to remove the old room association if it changed
-	txf := func(tx *redis.Tx) error {
+	txf := func(tx *kv.Tx) error {
 		var oldRoom string
 
 		oldInfo, err := s.loadIngress(tx, info.IngressId)
@@ -570,7 +570,7 @@ func (s *RedisStore) storeIngress(_ context.Context, info *livekit.IngressInfo) 
 			return err
 		}
 
-		results, err := tx.TxPipelined(s.ctx, func(p redis.Pipeliner) error {
+		results, err := tx.TxPipelined(s.ctx, func(p kv.Pipeliner) error {
 			p.HSet(s.ctx, IngressKey, info.IngressId, data)
 			if info.StreamKey != "" {
 				p.HSet(s.ctx, StreamKeyKey, info.StreamKey, info.IngressId)
@@ -605,7 +605,7 @@ func (s *RedisStore) storeIngress(_ context.Context, info *livekit.IngressInfo) 
 	for range maxRetries {
 		err := s.rc.Watch(s.ctx, txf, IngressKey)
 		switch err {
-		case redis.TxFailedErr:
+		case kv.TxFailedErr:
 			// Optimistic lock lost. Retry.
 			continue
 		default:
@@ -631,7 +631,7 @@ func (s *RedisStore) storeIngressState(_ context.Context, ingressId string, stat
 	}
 
 	// Use a "transaction" to remove the old room association if it changed
-	txf := func(tx *redis.Tx) error {
+	txf := func(tx *kv.Tx) error {
 		var oldStartedAt int64
 		var oldUpdatedAt int64
 
@@ -646,7 +646,7 @@ func (s *RedisStore) storeIngressState(_ context.Context, ingressId string, stat
 			return err
 		}
 
-		results, err := tx.TxPipelined(s.ctx, func(p redis.Pipeliner) error {
+		results, err := tx.TxPipelined(s.ctx, func(p kv.Pipeliner) error {
 			if state.StartedAt < oldStartedAt {
 				// Do not overwrite the info and state of a more recent session
 				return ingress.ErrIngressOutOfDate
@@ -680,7 +680,7 @@ func (s *RedisStore) storeIngressState(_ context.Context, ingressId string, stat
 	for range maxRetries {
 		err := s.rc.Watch(s.ctx, txf, IngressStatePrefix+ingressId)
 		switch err {
-		case redis.TxFailedErr:
+		case kv.TxFailedErr:
 			// Optimistic lock lost. Retry.
 			continue
 		default:
@@ -691,7 +691,7 @@ func (s *RedisStore) storeIngressState(_ context.Context, ingressId string, stat
 	return nil
 }
 
-func (s *RedisStore) loadIngress(c redis.Cmdable, ingressId string) (*livekit.IngressInfo, error) {
+func (s *RedisStore) loadIngress(c kv.Cmdable, ingressId string) (*livekit.IngressInfo, error) {
 	data, err := c.HGet(s.ctx, IngressKey, ingressId).Result()
 	switch err {
 	case nil:
@@ -702,7 +702,7 @@ func (s *RedisStore) loadIngress(c redis.Cmdable, ingressId string) (*livekit.In
 		}
 		return info, nil
 
-	case redis.Nil:
+	case kv.Nil:
 		return nil, ErrIngressNotFound
 
 	default:
@@ -710,7 +710,7 @@ func (s *RedisStore) loadIngress(c redis.Cmdable, ingressId string) (*livekit.In
 	}
 }
 
-func (s *RedisStore) loadIngressState(c redis.Cmdable, ingressId string) (*livekit.IngressState, error) {
+func (s *RedisStore) loadIngressState(c kv.Cmdable, ingressId string) (*livekit.IngressState, error) {
 	data, err := c.Get(s.ctx, IngressStatePrefix+ingressId).Result()
 	switch err {
 	case nil:
@@ -721,7 +721,7 @@ func (s *RedisStore) loadIngressState(c redis.Cmdable, ingressId string) (*livek
 		}
 		return state, nil
 
-	case redis.Nil:
+	case kv.Nil:
 		return nil, ErrIngressNotFound
 
 	default:
@@ -753,7 +753,7 @@ func (s *RedisStore) LoadIngressFromStreamKey(_ context.Context, streamKey strin
 	case nil:
 		return s.LoadIngress(s.ctx, ingressID)
 
-	case redis.Nil:
+	case kv.Nil:
 		return nil, ErrIngressNotFound
 
 	default:
@@ -767,7 +767,7 @@ func (s *RedisStore) ListIngress(_ context.Context, roomName livekit.RoomName) (
 	if roomName == "" {
 		data, err := s.rc.HGetAll(s.ctx, IngressKey).Result()
 		if err != nil {
-			if err == redis.Nil {
+			if err == kv.Nil {
 				return nil, nil
 			}
 			return nil, err
@@ -794,7 +794,7 @@ func (s *RedisStore) ListIngress(_ context.Context, roomName livekit.RoomName) (
 	} else {
 		ingressIDs, err := s.rc.SMembers(s.ctx, RoomIngressPrefix+string(roomName)).Result()
 		if err != nil {
-			if err == redis.Nil {
+			if err == kv.Nil {
 				return nil, nil
 			}
 			return nil, err
@@ -961,7 +961,7 @@ type protoMsg[T any] interface {
 
 func redisLoadOne[T any, P protoMsg[T]](ctx context.Context, s *RedisStore, key, id string, notFoundErr error) (P, error) {
 	data, err := s.rc.HGet(s.ctx, key, id).Result()
-	if err == redis.Nil {
+	if err == kv.Nil {
 		return nil, notFoundErr
 	} else if err != nil {
 		return nil, err
@@ -976,7 +976,7 @@ func redisLoadOne[T any, P protoMsg[T]](ctx context.Context, s *RedisStore, key,
 
 func redisLoadAll[T any, P protoMsg[T]](ctx context.Context, s *RedisStore, key string) ([]P, error) {
 	data, err := s.rc.HVals(s.ctx, key).Result()
-	if err == redis.Nil {
+	if err == kv.Nil {
 		return nil, nil
 	} else if err != nil {
 		return nil, err
@@ -996,7 +996,7 @@ func redisLoadAll[T any, P protoMsg[T]](ctx context.Context, s *RedisStore, key 
 
 func redisLoadBatch[T any, P protoMsg[T]](ctx context.Context, s *RedisStore, key string, ids []string, keepEmpty bool) ([]P, error) {
 	data, err := s.rc.HMGet(s.ctx, key, ids...).Result()
-	if err == redis.Nil {
+	if err == kv.Nil {
 		if keepEmpty {
 			return make([]P, len(ids)), nil
 		}
@@ -1033,7 +1033,7 @@ func redisLoadBatch[T any, P protoMsg[T]](ctx context.Context, s *RedisStore, ke
 
 func redisIDs(ctx context.Context, s *RedisStore, key string) ([]string, error) {
 	list, err := s.rc.HKeys(s.ctx, key).Result()
-	if err == redis.Nil {
+	if err == kv.Nil {
 		return nil, nil
 	} else if err != nil {
 		return nil, err

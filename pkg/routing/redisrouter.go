@@ -20,8 +20,8 @@ import (
 	"runtime/pprof"
 	"time"
 
-	"github.com/pkg/errors"
 	"github.com/hanzokv/go/v9"
+	"github.com/pkg/errors"
 	"go.uber.org/atomic"
 	"google.golang.org/protobuf/proto"
 
@@ -48,7 +48,7 @@ var _ Router = (*RedisRouter)(nil)
 type RedisRouter struct {
 	*LocalRouter
 
-	rc        redis.UniversalClient
+	rc        kv.UniversalClient
 	kps       rpc.KeepalivePubSub
 	ctx       context.Context
 	isStarted atomic.Bool
@@ -56,7 +56,7 @@ type RedisRouter struct {
 	cancel func()
 }
 
-func NewRedisRouter(lr *LocalRouter, rc redis.UniversalClient, kps rpc.KeepalivePubSub) *RedisRouter {
+func NewRedisRouter(lr *LocalRouter, rc kv.UniversalClient, kps rpc.KeepalivePubSub) *RedisRouter {
 	rr := &RedisRouter{
 		LocalRouter: lr,
 		rc:          rc,
@@ -100,7 +100,7 @@ func (r *RedisRouter) RemoveDeadNodes() error {
 // GetNodeForRoom finds the node where the room is hosted at
 func (r *RedisRouter) GetNodeForRoom(_ context.Context, roomName livekit.RoomName) (*livekit.Node, error) {
 	nodeID, err := r.rc.HGet(r.ctx, NodeRoomKey, string(roomName)).Result()
-	if err == redis.Nil {
+	if err == kv.Nil {
 		return nil, ErrNotFound
 	} else if err != nil {
 		return nil, errors.Wrap(err, "could not get node for room")
@@ -122,7 +122,7 @@ func (r *RedisRouter) ClearRoomState(_ context.Context, roomName livekit.RoomNam
 
 func (r *RedisRouter) GetNode(nodeID livekit.NodeID) (*livekit.Node, error) {
 	data, err := r.rc.HGet(r.ctx, NodesKey, string(nodeID)).Result()
-	if err == redis.Nil {
+	if err == kv.Nil {
 		return nil, ErrNotFound
 	} else if err != nil {
 		return nil, err

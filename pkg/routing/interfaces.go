@@ -163,7 +163,7 @@ type MessageRouter interface {
 }
 
 func CreateRouter(
-	rc redis.UniversalClient,
+	rc kv.UniversalClient,
 	node LocalNode,
 	signalClient SignalClient,
 	roomManagerClient RoomManagerClient,

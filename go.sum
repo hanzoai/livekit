@@ -141,10 +141,10 @@ github.com/grandcat/zeroconf v1.0.0 h1:uHhahLBKqwWBV6WZUDAT71044vwOTL+McW0mBJvo6
 github.com/grandcat/zeroconf v1.0.0/go.mod h1:lTKmG1zh86XyCoUeIHSA4FJMBwCJiQmGfcP2PdzytEs=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 h1:5VipnvEpbqr2gA2VbM+nYVbkIF28c5ZQfqCBQ5g2xfk=
 github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0/go.mod h1:Hyl3n6Twe1hvtd9XUXDec4pTvgMSEixRuQKPTMH2bNs=
-github.com/hanzoai/psrpc v0.7.3 h1:u1/dhiNp0kSxO2w7CMy0QrvU4pCQYFTiTDiiL1GYn80=
-github.com/hanzoai/psrpc v0.7.3/go.mod h1:urAobxTFgIqKdeDuc6ZS03pK0WmHXByApT6678GCo+U=
-github.com/hanzokv/go/v9 v9.21.1 h1:MUIAJTV1pI4pkKWSzrgJRzKA7W3aHUJ1WO0mtZRhhPc=
-github.com/hanzokv/go/v9 v9.21.1/go.mod h1:GV+nw+jX60sIrJ7LBkmOQw2WASXzkMstt52blcwNw6w=
+github.com/hanzoai/psrpc v0.7.4 h1:F7aJRXxEjWgcOyPlZ/krb8uRLw0deKTCDthd8+5iqRk=
+github.com/hanzoai/psrpc v0.7.4/go.mod h1:fhzyoQ5CVUs81DMvtfvv86aSxNhdsX1xseF6SE6tCXs=
+github.com/hanzokv/go/v9 v9.22.0 h1:zD4fh0NLBuVa8njIrXUivJCijlratzS1Yf7Y/uD5T00=
+github.com/hanzokv/go/v9 v9.22.0/go.mod h1:GV+nw+jX60sIrJ7LBkmOQw2WASXzkMstt52blcwNw6w=
 github.com/hashicorp/go-cleanhttp v0.5.2 h1:035FKYIWjmULyFRBKPs8TBQoi0x6d9G4xc9neXJWAZQ=
 github.com/hashicorp/go-cleanhttp v0.5.2/go.mod h1:kO/YDlP8L1346E6Sodw+PrpBSV4/SoxCXGY6BqNFT48=
 github.com/hashicorp/go-hclog v1.6.3 h1:Qr2kF+eVWjTiYmU7Y31tYlP1h0q/X3Nl3tPGdaB11/k=
