@@ -17,7 +17,7 @@ import (
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils/guid"
 	"github.com/livekit/protocol/utils/must"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 )
 
 func TestAgent(t *testing.T) {

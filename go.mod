@@ -15,8 +15,6 @@ require (
 	github.com/google/uuid v1.6.0
 	github.com/google/wire v0.7.0
 	github.com/gorilla/websocket v1.5.3
-	github.com/hanzoai/psrpc v0.7.4
-	github.com/hanzokv/go/v9 v9.22.0
 	github.com/hashicorp/go-version v1.8.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jellydator/ttlcache/v3 v3.4.0
@@ -24,6 +22,7 @@ require (
 	github.com/livekit/mageutil v0.0.0-20250511045019-0f1ff63f7731
 	github.com/livekit/mediatransportutil v0.0.0-20260601042523-13d536af56d9
 	github.com/livekit/protocol v1.45.9-0.20260519061926-8381f2180c45
+	github.com/livekit/psrpc v0.7.1
 	github.com/mackerelio/go-osstat v0.2.7
 	github.com/magefile/mage v1.17.0
 	github.com/maxbrunsfeld/counterfeiter/v6 v6.12.2
@@ -42,6 +41,8 @@ require (
 	github.com/pion/turn/v5 v5.0.4
 	github.com/pion/webrtc/v4 v4.2.11
 	github.com/pkg/errors v0.9.1
+	github.com/prometheus/client_golang v1.22.0
+	github.com/redis/go-redis/v9 v9.18.0
 	github.com/rs/cors v1.11.1
 	github.com/stretchr/testify v1.11.1
 	github.com/thoas/go-funk v0.9.3
@@ -69,7 +70,6 @@ require (
 	github.com/gorilla/rpc v1.2.1 // indirect
 	github.com/grandcat/zeroconf v1.0.0 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.29.0 // indirect
-	github.com/livekit/psrpc v0.7.1 // indirect
 	github.com/luxfi/mdns v0.1.0 // indirect
 	github.com/luxfi/zap v0.6.0 // indirect
 	github.com/mattn/go-colorable v0.1.14 // indirect
@@ -80,8 +80,6 @@ require (
 	github.com/olekukonko/cat v0.0.0-20250911104152-50322a0618f6 // indirect
 	github.com/olekukonko/errors v1.2.0 // indirect
 	github.com/olekukonko/ll v0.1.6 // indirect
-	github.com/prometheus/client_golang v1.22.0 // indirect
-	github.com/redis/go-redis/v9 v9.11.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/otel v1.44.0 // indirect
 	go.opentelemetry.io/otel/exporters/otlp/otlptrace v1.43.0 // indirect

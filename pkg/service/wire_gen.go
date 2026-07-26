@@ -13,9 +13,6 @@ import (
 	"github.com/hanzoai/livekit/pkg/routing"
 	"github.com/hanzoai/livekit/pkg/sfu"
 	"github.com/hanzoai/livekit/pkg/telemetry"
-	"github.com/hanzoai/psrpc"
-	"github.com/hanzoai/psrpc/pkg/middleware/otelpsrpc"
-	"github.com/hanzokv/go/v9"
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
@@ -23,8 +20,11 @@ import (
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/webhook"
+	"github.com/livekit/psrpc"
+	"github.com/livekit/psrpc/pkg/middleware/otelpsrpc"
 	"github.com/pion/turn/v5"
 	"github.com/pkg/errors"
+	"github.com/redis/go-redis/v9"
 	"gopkg.in/yaml.v3"
 	"os"
 )
@@ -244,25 +244,25 @@ func createTelemetryService(notifier webhook.QueuedNotifier, analytics telemetry
 	return svc
 }
 
-func createRedisClient(conf *config.Config) (kv.UniversalClient, error) {
+func createRedisClient(conf *config.Config) (redis.UniversalClient, error) {
 	if !conf.Redis.IsConfigured() {
 		return nil, nil
 	}
 	return redis2.GetRedisClient(&conf.Redis)
 }
 
-func createStore(rc kv.UniversalClient) ObjectStore {
+func createStore(rc redis.UniversalClient) ObjectStore {
 	if rc != nil {
 		return NewRedisStore(rc)
 	}
 	return NewLocalStore()
 }
 
-func getMessageBus(rc kv.UniversalClient) psrpc.MessageBus {
+func getMessageBus(rc redis.UniversalClient) psrpc.MessageBus {
 	if rc == nil {
 		return psrpc.NewLocalMessageBus()
 	}
-	return psrpc.NewKVMessageBus(rc)
+	return psrpc.NewRedisMessageBus(rc)
 }
 
 func getEgressStore(s ObjectStore) EgressStore {

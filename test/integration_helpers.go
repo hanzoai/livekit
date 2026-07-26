@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hanzokv/go/v9"
+	"github.com/redis/go-redis/v9"
 	"github.com/twitchtv/twirp"
 
 	"github.com/livekit/mediatransportutil/pkg/rtcconfig"
@@ -299,8 +299,8 @@ func createRTCClientWithToken(token string, port int, testRTCServicePath testRTC
 	return c
 }
 
-func redisClient() *kv.Client {
-	return kv.NewClient(&kv.Options{
+func redisClient() *redis.Client {
+	return redis.NewClient(&redis.Options{
 		Addr: "localhost:6379",
 	})
 }

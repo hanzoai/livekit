@@ -7,7 +7,7 @@ import (
 
 	"github.com/hanzoai/livekit/pkg/routing"
 	"github.com/livekit/protocol/livekit"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 )
 
 type FakeRoomManagerClient struct {

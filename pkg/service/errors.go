@@ -15,7 +15,7 @@
 package service
 
 import (
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 )
 
 var (

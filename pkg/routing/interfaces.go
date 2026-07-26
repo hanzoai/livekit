@@ -18,7 +18,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/hanzokv/go/v9"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/atomic"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/proto"
@@ -163,7 +163,7 @@ type MessageRouter interface {
 }
 
 func CreateRouter(
-	rc kv.UniversalClient,
+	rc redis.UniversalClient,
 	node LocalNode,
 	signalClient SignalClient,
 	roomManagerClient RoomManagerClient,

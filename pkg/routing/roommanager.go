@@ -20,8 +20,8 @@ import (
 	"github.com/hanzoai/livekit/pkg/config"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/rpc"
-	"github.com/hanzoai/psrpc"
-	"github.com/hanzoai/psrpc/pkg/middleware"
+	"github.com/livekit/psrpc"
+	"github.com/livekit/psrpc/pkg/middleware"
 )
 
 //counterfeiter:generate . RoomManagerClient

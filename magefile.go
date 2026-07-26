@@ -29,7 +29,7 @@ import (
 
 	"github.com/hanzoai/livekit/version"
 	"github.com/livekit/mageutil"
-	_ "github.com/hanzoai/psrpc"
+	_ "github.com/livekit/psrpc"
 )
 
 const (
@@ -92,7 +92,7 @@ func BuildLinux() error {
 	if len(buildArch) == 0 {
 		buildArch = "amd64"
 	}
-	cmd := mageutil.CommandDir(context.Background(), "cmd/server", "go build -buildvcs=false -o ../../bin/livekit-server-" + buildArch)
+	cmd := mageutil.CommandDir(context.Background(), "cmd/server", "go build -buildvcs=false -o ../../bin/livekit-server-"+buildArch)
 	cmd.Env = []string{
 		"GOOS=linux",
 		"GOARCH=" + buildArch,

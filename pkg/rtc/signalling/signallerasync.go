@@ -20,7 +20,7 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 
 	"github.com/hanzoai/livekit/pkg/routing"
 	"github.com/hanzoai/livekit/pkg/rtc/types"

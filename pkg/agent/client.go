@@ -28,7 +28,7 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 )
 
 const (
@@ -62,8 +62,8 @@ type JobRequest struct {
 	// only set for participant jobs
 	Participant *livekit.ParticipantInfo
 	Metadata    string
-	AgentName  string
-	Deployment string
+	AgentName   string
+	Deployment  string
 }
 
 type agentClient struct {

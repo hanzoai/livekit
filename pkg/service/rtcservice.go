@@ -34,7 +34,7 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 
 	"github.com/hanzoai/livekit/pkg/config"
 	"github.com/hanzoai/livekit/pkg/routing"

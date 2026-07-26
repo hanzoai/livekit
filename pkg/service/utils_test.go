@@ -22,15 +22,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/hanzokv/go/v9"
+	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/require"
 
 	"github.com/hanzoai/livekit/pkg/service"
 )
 
-func redisClientDocker(t testing.TB) *kv.Client {
+func redisClientDocker(t testing.TB) *redis.Client {
 	addr := runRedis(t)
-	cli := kv.NewClient(&kv.Options{
+	cli := redis.NewClient(&redis.Options{
 		Addr: addr,
 	})
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -46,8 +46,8 @@ func redisClientDocker(t testing.TB) *kv.Client {
 	return cli
 }
 
-func redisClient(t testing.TB) *kv.Client {
-	cli := kv.NewClient(&kv.Options{
+func redisClient(t testing.TB) *redis.Client {
+	cli := redis.NewClient(&redis.Options{
 		Addr: "localhost:6379",
 	})
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

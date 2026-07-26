@@ -29,7 +29,7 @@ import (
 	"github.com/livekit/protocol/sip"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 
 	"github.com/hanzoai/livekit/pkg/config"
 	"github.com/hanzoai/livekit/pkg/telemetry"

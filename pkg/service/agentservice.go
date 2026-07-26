@@ -39,7 +39,7 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 )
 
 type AgentSocketUpgrader struct {

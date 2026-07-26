@@ -16,7 +16,7 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 )
 
 const (

@@ -48,7 +48,7 @@ import (
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
 	"github.com/livekit/protocol/utils/pointer"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 
 	"github.com/hanzoai/livekit/pkg/config"
 	"github.com/hanzoai/livekit/pkg/metric"

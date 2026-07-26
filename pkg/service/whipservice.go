@@ -35,7 +35,7 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils/guid"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 )
 
 const (

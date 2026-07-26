@@ -31,7 +31,7 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/protojson"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 )
 
 func init() {

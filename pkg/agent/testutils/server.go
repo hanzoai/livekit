@@ -24,7 +24,7 @@ import (
 	"github.com/livekit/protocol/utils/guid"
 	"github.com/livekit/protocol/utils/must"
 	"github.com/livekit/protocol/utils/options"
-	"github.com/hanzoai/psrpc"
+	"github.com/livekit/psrpc"
 )
 
 type AgentService interface {

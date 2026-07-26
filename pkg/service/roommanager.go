@@ -41,8 +41,8 @@ import (
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
 	"github.com/livekit/protocol/utils/must"
-	"github.com/hanzoai/psrpc"
-	"github.com/hanzoai/psrpc/pkg/middleware"
+	"github.com/livekit/psrpc"
+	"github.com/livekit/psrpc/pkg/middleware"
 
 	"github.com/hanzoai/livekit/pkg/agent"
 	"github.com/hanzoai/livekit/pkg/sfu"
