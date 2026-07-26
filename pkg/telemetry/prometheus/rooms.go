@@ -19,6 +19,7 @@ import (
 	"time"
 
 	metric "github.com/luxfi/metric"
+	"github.com/prometheus/client_golang/prometheus"
 	"go.uber.org/atomic"
 
 	"github.com/livekit/protocol/livekit"
@@ -42,13 +43,13 @@ var (
 	promRoomCurrent            metric.Gauge
 	promRoomDuration           metric.Histogram
 	promParticipantCurrent     metric.Gauge
-	promTrackPublishedCurrent  *metric.GaugeVec
-	promTrackSubscribedCurrent *metric.GaugeVec
-	promTrackPublishCounter    *metric.CounterVec
-	promTrackSubscribeCounter  *metric.CounterVec
-	promSessionStartTime       *metric.HistogramVec
-	promSessionDuration        *metric.HistogramVec
-	promPubSubTime             *metric.HistogramVec
+	promTrackPublishedCurrent  metric.GaugeVec
+	promTrackSubscribedCurrent metric.GaugeVec
+	promTrackPublishCounter    metric.CounterVec
+	promTrackSubscribeCounter  metric.CounterVec
+	promSessionStartTime       metric.HistogramVec
+	promSessionDuration        metric.HistogramVec
+	promPubSubTime             metric.HistogramVec
 )
 
 func initRoomStats(nodeID string, nodeType livekit.NodeType) {
@@ -102,14 +103,14 @@ func initRoomStats(nodeID string, nodeType livekit.NodeType) {
 		Subsystem:   "session",
 		Name:        "start_time_ms",
 		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
-		Buckets:     metric.ExponentialBucketsRange(100, 10000, 15),
+		Buckets:     prometheus.ExponentialBucketsRange(100, 10000, 15),
 	}, []string{"protocol_version"})
 	promSessionDuration = metric.NewHistogramVec(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
 		Subsystem:   "session",
 		Name:        "duration_ms",
 		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
-		Buckets:     metric.ExponentialBucketsRange(100, 4*60*60*1000, 15),
+		Buckets:     prometheus.ExponentialBucketsRange(100, 4*60*60*1000, 15),
 	}, []string{"protocol_version"})
 	promPubSubTime = metric.NewHistogramVec(metric.HistogramOpts{
 		Namespace:   livekitNamespace,
@@ -118,17 +119,6 @@ func initRoomStats(nodeID string, nodeType livekit.NodeType) {
 		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets:     []float64{100, 200, 500, 700, 1000, 5000, 10000},
 	}, append(promStreamLabels, "sdk", "kind", "count"))
-
-	metric.MustRegister(promRoomCurrent)
-	metric.MustRegister(promRoomDuration)
-	metric.MustRegister(promParticipantCurrent)
-	metric.MustRegister(promTrackPublishedCurrent)
-	metric.MustRegister(promTrackSubscribedCurrent)
-	metric.MustRegister(promTrackPublishCounter)
-	metric.MustRegister(promTrackSubscribeCounter)
-	metric.MustRegister(promSessionStartTime)
-	metric.MustRegister(promSessionDuration)
-	metric.MustRegister(promPubSubTime)
 }
 
 func RoomStarted() {

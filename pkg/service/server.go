@@ -159,7 +159,7 @@ func NewLivekitServer(conf *config.Config,
 	}
 
 	if conf.Prometheus.Port > 0 {
-		promHandler := metric.NewHTTPHandler(metric.DefaultGatherer, metric.HandlerOpts{})
+		promHandler := metric.NewHTTPHandler(metric.DefaultRegistry, metric.HandlerOpts{})
 		if conf.Prometheus.Username != "" && conf.Prometheus.Password != "" {
 			protectedHandler := negroni.New()
 			protectedHandler.Use(negroni.HandlerFunc(GenBasicAuthMiddleware(conf.Prometheus.Username, conf.Prometheus.Password)))

@@ -27,8 +27,8 @@ var (
 	promDataPacketStreamLabels    = []string{"type", "mime_type"}
 	promDataPacketStreamMimeTypes = []string{"text", "image", "application", "audio", "video"}
 
-	promDataPacketStreamDestCount *metric.HistogramVec
-	promDataPacketStreamSize      *metric.HistogramVec
+	promDataPacketStreamDestCount metric.HistogramVec
+	promDataPacketStreamSize      metric.HistogramVec
 )
 
 func initDataPacketStats(nodeID string, nodeType livekit.NodeType) {
@@ -46,9 +46,6 @@ func initDataPacketStats(nodeID string, nodeType livekit.NodeType) {
 		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets:     []float64{128, 512, 2048, 8192, 32768, 131072, 524288, 2097152, 8388608, 33554432},
 	}, promDataPacketStreamLabels)
-
-	metric.MustRegister(promDataPacketStreamDestCount)
-	metric.MustRegister(promDataPacketStreamSize)
 }
 
 func RecordDataPacketStream(h *livekit.DataStream_Header, destCount int) {

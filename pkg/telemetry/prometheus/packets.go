@@ -51,21 +51,21 @@ var (
 	forwardJitter              atomic.Uint32
 
 	promPacketLabels          = []string{"direction", "transmission", "country"}
-	promPacketTotal           *metric.CounterVec
-	promPacketBytes           *metric.CounterVec
+	promPacketTotal           metric.CounterVec
+	promPacketBytes           metric.CounterVec
 	promRTCPLabels            = []string{"direction", "country"}
 	promStreamLabels          = []string{"direction", "source", "type", "country"}
-	promNackTotal             *metric.CounterVec
-	promPliTotal              *metric.CounterVec
-	promFirTotal              *metric.CounterVec
-	promPacketLossTotal       *metric.CounterVec
-	promPacketLoss            *metric.HistogramVec
-	promPacketOutOfOrderTotal *metric.CounterVec
-	promPacketOutOfOrder      *metric.HistogramVec
-	promJitter                *metric.HistogramVec
-	promRTT                   *metric.HistogramVec
-	promParticipantJoin       *metric.CounterVec
-	promConnections           *metric.GaugeVec
+	promNackTotal             metric.CounterVec
+	promPliTotal              metric.CounterVec
+	promFirTotal              metric.CounterVec
+	promPacketLossTotal       metric.CounterVec
+	promPacketLoss            metric.HistogramVec
+	promPacketOutOfOrderTotal metric.CounterVec
+	promPacketOutOfOrder      metric.HistogramVec
+	promJitter                metric.HistogramVec
+	promRTT                   metric.HistogramVec
+	promParticipantJoin       metric.CounterVec
+	promConnections           metric.GaugeVec
 	promForwardLatency        metric.Gauge
 	promForwardJitter         metric.Gauge
 	promForwardLatencyHist    metric.Histogram
@@ -186,23 +186,6 @@ func initPacketStats(nodeID string, nodeType livekit.NodeType) {
 			20 * 1000 * 1000,
 		},
 	})
-
-	metric.MustRegister(promPacketTotal)
-	metric.MustRegister(promPacketBytes)
-	metric.MustRegister(promNackTotal)
-	metric.MustRegister(promPliTotal)
-	metric.MustRegister(promFirTotal)
-	metric.MustRegister(promPacketLossTotal)
-	metric.MustRegister(promPacketLoss)
-	metric.MustRegister(promPacketOutOfOrderTotal)
-	metric.MustRegister(promPacketOutOfOrder)
-	metric.MustRegister(promJitter)
-	metric.MustRegister(promRTT)
-	metric.MustRegister(promParticipantJoin)
-	metric.MustRegister(promConnections)
-	metric.MustRegister(promForwardLatency)
-	metric.MustRegister(promForwardJitter)
-	metric.MustRegister(promForwardLatencyHist)
 }
 
 func IncrementPackets(country string, direction Direction, count uint64, retransmit bool) {

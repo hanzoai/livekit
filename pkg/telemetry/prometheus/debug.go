@@ -21,7 +21,7 @@ import (
 )
 
 var (
-	refCounts *metric.GaugeVec
+	refCounts metric.GaugeVec
 )
 
 func initDebugStats(nodeID string, nodeType livekit.NodeType) {
@@ -31,8 +31,6 @@ func initDebugStats(nodeID string, nodeType livekit.NodeType) {
 		Name:        "ref_count",
 		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 	}, []string{"referrer"})
-
-	metric.MustRegister(refCounts)
 }
 
 func AddRef(referrer string, n int) {

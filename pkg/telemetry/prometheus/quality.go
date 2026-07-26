@@ -40,9 +40,6 @@ func initQualityStats(nodeID string, nodeType livekit.NodeType) {
 		ConstLabels: metric.Labels{"node_id": nodeID, "node_type": nodeType.String()},
 		Buckets:     []float64{1.0, 2.0, 2.5, 3.0, 3.25, 3.5, 3.75, 4.0, 4.25, 4.5},
 	})
-
-	metric.MustRegister(qualityRating)
-	metric.MustRegister(qualityScore)
 }
 
 func RecordQuality(rating livekit.ConnectionQuality, score float32) {

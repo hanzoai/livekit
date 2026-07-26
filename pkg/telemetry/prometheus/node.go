@@ -18,6 +18,7 @@ import (
 	"time"
 
 	metric "github.com/luxfi/metric"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/twitchtv/twirp"
 	"go.uber.org/atomic"
 
@@ -34,14 +35,14 @@ const (
 var (
 	initialized atomic.Bool
 
-	promMessageCounter            *metric.CounterVec
-	promServiceOperationCounter   *metric.CounterVec
-	promTwirpRequestStatusCounter *metric.CounterVec
-	promTwirpRequestLatency       *metric.HistogramVec
+	promMessageCounter            metric.CounterVec
+	promServiceOperationCounter   metric.CounterVec
+	promTwirpRequestStatusCounter metric.CounterVec
+	promTwirpRequestLatency       metric.HistogramVec
 
 	sysPacketsStart        uint32
 	sysDroppedPacketsStart uint32
-	promSysPacketGauge     *metric.GaugeVec
+	promSysPacketGauge     metric.GaugeVec
 
 	cpuStats    *hwstats.CPUStats
 	memoryStats *hwstats.MemoryStats
@@ -104,18 +105,12 @@ func Init(nodeID string, nodeType livekit.NodeType) error {
 		[]string{"type"},
 	)
 
-	metric.MustRegister(promMessageCounter)
-	metric.MustRegister(promServiceOperationCounter)
-	metric.MustRegister(promTwirpRequestStatusCounter)
-	metric.MustRegister(promTwirpRequestLatency)
-	metric.MustRegister(promSysPacketGauge)
-
 	sysPacketsStart, sysDroppedPacketsStart, _ = getTCStats()
 
 	initPacketStats(nodeID, nodeType)
 	initRoomStats(nodeID, nodeType)
-	rpc.InitPSRPCStats(metric.Labels{"node_id": nodeID, "node_type": nodeType.String()})
-	webhook.InitWebhookStats(metric.Labels{"node_id": nodeID, "node_type": nodeType.String()})
+	rpc.InitPSRPCStats(prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()})
+	webhook.InitWebhookStats(prometheus.Labels{"node_id": nodeID, "node_type": nodeType.String()})
 	initQualityStats(nodeID, nodeType)
 	initDataPacketStats(nodeID, nodeType)
 	initDebugStats(nodeID, nodeType)
