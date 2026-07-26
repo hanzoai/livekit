@@ -21,7 +21,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/livekit/livekit-server/pkg/testutils"
+	"github.com/hanzoai/livekit/pkg/testutils"
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
 )

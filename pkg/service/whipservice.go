@@ -26,16 +26,16 @@ import (
 	"github.com/pion/webrtc/v4"
 	"github.com/tomnomnom/linkheader"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/rtc"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	sutils "github.com/livekit/livekit-server/pkg/utils"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/rtc"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	sutils "github.com/hanzoai/livekit/pkg/utils"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils/guid"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 )
 
 const (

@@ -28,12 +28,12 @@ import (
 	"github.com/livekit/protocol/observability/roomobs"
 	"github.com/livekit/protocol/utils"
 
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/rtc/datatrack"
-	"github.com/livekit/livekit-server/pkg/sfu"
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
-	"github.com/livekit/livekit-server/pkg/sfu/pacer"
-	"github.com/livekit/livekit-server/pkg/telemetry"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/rtc/datatrack"
+	"github.com/hanzoai/livekit/pkg/sfu"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu/pacer"
+	"github.com/hanzoai/livekit/pkg/telemetry"
 
 	"google.golang.org/protobuf/proto"
 )

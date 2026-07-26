@@ -17,8 +17,8 @@ package service_test
 import (
 	"context"
 	"github.com/dennwc/iters"
-	"github.com/livekit/livekit-server/pkg/service"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/livekit/pkg/service"
+	"github.com/hanzoai/psrpc"
 	"slices"
 	"testing"
 

@@ -23,7 +23,7 @@ import (
 	"github.com/pion/sdp/v3"
 	"github.com/pion/webrtc/v4"
 
-	"github.com/livekit/livekit-server/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
 	"github.com/livekit/protocol/codecs/mime"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"

@@ -24,7 +24,7 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 
-	"github.com/livekit/livekit-server/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
 )
 
 var _ DynacastManager = (*dynacastManagerVideo)(nil)

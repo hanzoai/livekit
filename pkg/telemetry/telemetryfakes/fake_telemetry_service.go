@@ -5,7 +5,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/livekit/livekit-server/pkg/telemetry"
+	"github.com/hanzoai/livekit/pkg/telemetry"
 	"github.com/livekit/protocol/codecs/mime"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/observability/roomobs"

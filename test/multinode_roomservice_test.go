@@ -22,7 +22,7 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 
-	"github.com/livekit/livekit-server/pkg/testutils"
+	"github.com/hanzoai/livekit/pkg/testutils"
 )
 
 func TestMultiNodeRoomList(t *testing.T) {

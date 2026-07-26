@@ -23,15 +23,15 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/service"
-	"github.com/livekit/livekit-server/pkg/service/servicefakes"
-	"github.com/livekit/livekit-server/pkg/telemetry/prometheus"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/service"
+	"github.com/hanzoai/livekit/pkg/service/servicefakes"
+	"github.com/hanzoai/livekit/pkg/telemetry/prometheus"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/protojson"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 )
 
 func init() {

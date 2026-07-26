@@ -5,7 +5,7 @@ import (
 	"context"
 	"sync"
 
-	"github.com/livekit/livekit-server/pkg/service"
+	"github.com/hanzoai/livekit/pkg/service"
 	"github.com/livekit/protocol/livekit"
 )
 

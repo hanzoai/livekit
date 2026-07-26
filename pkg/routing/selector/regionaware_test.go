@@ -24,8 +24,8 @@ import (
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing/selector"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing/selector"
 )
 
 const (

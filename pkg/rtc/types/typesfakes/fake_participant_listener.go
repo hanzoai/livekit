@@ -4,8 +4,8 @@ package typesfakes
 import (
 	"sync"
 
-	"github.com/livekit/livekit-server/pkg/rtc/datatrack"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/rtc/datatrack"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
 	"github.com/livekit/protocol/livekit"
 )
 

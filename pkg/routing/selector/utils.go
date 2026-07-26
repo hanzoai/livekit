@@ -23,8 +23,8 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/utils"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/utils"
 )
 
 const AvailableSeconds = 5

@@ -20,7 +20,7 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 
-	"github.com/livekit/livekit-server/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/routing"
 )
 
 func TestMessageChannel_WriteMessageClosed(t *testing.T) {

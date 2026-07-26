@@ -22,10 +22,10 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
-	"github.com/livekit/psrpc"
-	"github.com/livekit/psrpc/pkg/middleware/otelpsrpc"
+	"github.com/hanzoai/psrpc"
+	"github.com/hanzoai/psrpc/pkg/middleware/otelpsrpc"
 
-	"github.com/livekit/livekit-server/pkg/telemetry"
+	"github.com/hanzoai/livekit/pkg/telemetry"
 )
 
 type IOInfoService struct {

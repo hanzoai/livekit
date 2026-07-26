@@ -17,7 +17,7 @@ package clientconfiguration
 import (
 	"google.golang.org/protobuf/proto"
 
-	"github.com/livekit/livekit-server/pkg/utils"
+	"github.com/hanzoai/livekit/pkg/utils"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	protoutils "github.com/livekit/protocol/utils"

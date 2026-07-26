@@ -21,7 +21,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	"github.com/redis/go-redis/v9"
+	"github.com/hanzokv/go/v9"
 	"go.uber.org/atomic"
 	"google.golang.org/protobuf/proto"
 
@@ -29,7 +29,7 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 
-	"github.com/livekit/livekit-server/pkg/routing/selector"
+	"github.com/hanzoai/livekit/pkg/routing/selector"
 )
 
 const (

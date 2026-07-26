@@ -27,9 +27,9 @@ import (
 
 	"github.com/magefile/mage/mg"
 
-	"github.com/livekit/livekit-server/version"
+	"github.com/hanzoai/livekit/version"
 	"github.com/livekit/mageutil"
-	_ "github.com/livekit/psrpc"
+	_ "github.com/hanzoai/psrpc"
 )
 
 const (

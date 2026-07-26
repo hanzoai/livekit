@@ -21,8 +21,8 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/telemetry/prometheus"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/telemetry/prometheus"
 )
 
 type NodeStats struct {

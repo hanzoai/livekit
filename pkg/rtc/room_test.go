@@ -27,17 +27,17 @@ import (
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/webhook"
 
-	"github.com/livekit/livekit-server/version"
+	"github.com/hanzoai/livekit/version"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/rtc/types/typesfakes"
-	"github.com/livekit/livekit-server/pkg/sfu"
-	"github.com/livekit/livekit-server/pkg/sfu/audio"
-	"github.com/livekit/livekit-server/pkg/telemetry"
-	"github.com/livekit/livekit-server/pkg/telemetry/prometheus"
-	"github.com/livekit/livekit-server/pkg/telemetry/telemetryfakes"
-	"github.com/livekit/livekit-server/pkg/testutils"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/rtc/types/typesfakes"
+	"github.com/hanzoai/livekit/pkg/sfu"
+	"github.com/hanzoai/livekit/pkg/sfu/audio"
+	"github.com/hanzoai/livekit/pkg/telemetry"
+	"github.com/hanzoai/livekit/pkg/telemetry/prometheus"
+	"github.com/hanzoai/livekit/pkg/telemetry/telemetryfakes"
+	"github.com/hanzoai/livekit/pkg/testutils"
 )
 
 func init() {

@@ -15,7 +15,7 @@
 package temporallayerselector
 
 import (
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
 	"github.com/livekit/mediatransportutil/pkg/codec"
 	"github.com/livekit/protocol/logger"
 )

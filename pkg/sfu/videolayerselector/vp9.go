@@ -17,7 +17,7 @@ package videolayerselector
 import (
 	"github.com/pion/rtp/codecs"
 
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
 	"github.com/livekit/protocol/logger"
 )
 

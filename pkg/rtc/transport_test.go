@@ -26,9 +26,9 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/atomic"
 
-	"github.com/livekit/livekit-server/pkg/rtc/transport"
-	"github.com/livekit/livekit-server/pkg/rtc/transport/transportfakes"
-	"github.com/livekit/livekit-server/pkg/testutils"
+	"github.com/hanzoai/livekit/pkg/rtc/transport"
+	"github.com/hanzoai/livekit/pkg/rtc/transport/transportfakes"
+	"github.com/hanzoai/livekit/pkg/testutils"
 	"github.com/livekit/protocol/codecs/mime"
 	"github.com/livekit/protocol/livekit"
 )

@@ -18,13 +18,13 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/redis/go-redis/v9"
+	"github.com/hanzokv/go/v9"
 	"go.uber.org/atomic"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/utils"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/utils"
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"

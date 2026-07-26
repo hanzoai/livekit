@@ -19,15 +19,15 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/telemetry"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/telemetry"
 	"github.com/livekit/protocol/ingress"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 )
 
 type IngressLauncher interface {

@@ -15,7 +15,7 @@
 package telemetry
 
 import (
-	"github.com/livekit/livekit-server/pkg/telemetry/prometheus"
+	"github.com/hanzoai/livekit/pkg/telemetry/prometheus"
 	"github.com/livekit/protocol/livekit"
 )
 

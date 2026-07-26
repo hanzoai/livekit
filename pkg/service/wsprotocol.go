@@ -28,7 +28,7 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/protojson"
 
-	"github.com/livekit/livekit-server/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
 )
 
 const (

@@ -29,9 +29,9 @@ import (
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 
-	"github.com/livekit/livekit-server/pkg/rtc"
+	"github.com/hanzoai/livekit/pkg/rtc"
 )
 
 type EgressService struct {

@@ -23,8 +23,8 @@ import (
 	"github.com/frostbyte73/core"
 	"go.uber.org/atomic"
 
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/telemetry"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/telemetry"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/observability/roomobs"
 	"github.com/livekit/protocol/utils"

@@ -20,16 +20,16 @@ import (
 	"github.com/pkg/errors"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/telemetry/prometheus"
-	"github.com/livekit/livekit-server/pkg/utils"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/telemetry/prometheus"
+	"github.com/hanzoai/livekit/pkg/utils"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
-	"github.com/livekit/psrpc"
-	"github.com/livekit/psrpc/pkg/metadata"
-	"github.com/livekit/psrpc/pkg/middleware"
+	"github.com/hanzoai/psrpc"
+	"github.com/hanzoai/psrpc/pkg/metadata"
+	"github.com/hanzoai/psrpc/pkg/middleware"
 )
 
 //counterfeiter:generate . SessionHandler

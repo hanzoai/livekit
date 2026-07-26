@@ -17,7 +17,7 @@ package codecmunger
 import (
 	"errors"
 
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
 )
 
 var (

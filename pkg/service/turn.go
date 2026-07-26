@@ -33,9 +33,9 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/logger/pionlogger"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/telemetry"
-	"github.com/livekit/livekit-server/pkg/telemetry/prometheus"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/telemetry"
+	"github.com/hanzoai/livekit/pkg/telemetry/prometheus"
 )
 
 const (

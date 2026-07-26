@@ -20,7 +20,7 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 
-	"github.com/livekit/livekit-server/pkg/config"
+	"github.com/hanzoai/livekit/pkg/config"
 )
 
 var ErrUnsupportedSelector = errors.New("unsupported node selector")

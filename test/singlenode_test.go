@@ -42,14 +42,14 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/rtc"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/service"
-	"github.com/livekit/livekit-server/pkg/sfu"
-	"github.com/livekit/livekit-server/pkg/sfu/datachannel"
-	"github.com/livekit/livekit-server/pkg/testutils"
-	testclient "github.com/livekit/livekit-server/test/client"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/rtc"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/service"
+	"github.com/hanzoai/livekit/pkg/sfu"
+	"github.com/hanzoai/livekit/pkg/sfu/datachannel"
+	"github.com/hanzoai/livekit/pkg/testutils"
+	testclient "github.com/hanzoai/livekit/test/client"
 )
 
 const (

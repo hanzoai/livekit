@@ -34,14 +34,14 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/rtc"
-	"github.com/livekit/livekit-server/pkg/telemetry"
-	"github.com/livekit/livekit-server/pkg/telemetry/prometheus"
-	"github.com/livekit/livekit-server/pkg/utils"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/rtc"
+	"github.com/hanzoai/livekit/pkg/telemetry"
+	"github.com/hanzoai/livekit/pkg/telemetry/prometheus"
+	"github.com/hanzoai/livekit/pkg/utils"
 )
 
 type RTCService struct {

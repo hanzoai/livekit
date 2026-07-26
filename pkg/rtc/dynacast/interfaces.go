@@ -18,7 +18,7 @@ import (
 	"github.com/livekit/protocol/codecs/mime"
 	"github.com/livekit/protocol/livekit"
 
-	"github.com/livekit/livekit-server/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
 )
 
 type DynacastManagerListener interface {

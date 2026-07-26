@@ -19,8 +19,8 @@ import (
 
 	"github.com/pion/webrtc/v4"
 
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/sfu/streamallocator"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/sfu/streamallocator"
 	"github.com/livekit/protocol/livekit"
 )
 

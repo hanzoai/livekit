@@ -28,18 +28,18 @@ import (
 	"github.com/gorilla/websocket"
 	"google.golang.org/protobuf/types/known/emptypb"
 
-	"github.com/livekit/livekit-server/pkg/agent"
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/rtc"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/version"
+	"github.com/hanzoai/livekit/pkg/agent"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/rtc"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/version"
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 )
 
 type AgentSocketUpgrader struct {

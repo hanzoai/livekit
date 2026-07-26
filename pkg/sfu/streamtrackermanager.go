@@ -26,8 +26,8 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
-	"github.com/livekit/livekit-server/pkg/sfu/streamtracker"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu/streamtracker"
 )
 
 // ---------------------------------------------------

@@ -22,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/redis/go-redis/v9"
+	"github.com/hanzokv/go/v9"
 	"github.com/twitchtv/twirp"
 
 	"github.com/livekit/mediatransportutil/pkg/rtcconfig"
@@ -31,12 +31,12 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/guid"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/service"
-	"github.com/livekit/livekit-server/pkg/telemetry/prometheus"
-	"github.com/livekit/livekit-server/pkg/testutils"
-	testclient "github.com/livekit/livekit-server/test/client"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/service"
+	"github.com/hanzoai/livekit/pkg/telemetry/prometheus"
+	"github.com/hanzoai/livekit/pkg/testutils"
+	testclient "github.com/hanzoai/livekit/test/client"
 )
 
 const (

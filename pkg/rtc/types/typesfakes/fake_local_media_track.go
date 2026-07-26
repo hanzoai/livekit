@@ -4,8 +4,8 @@ package typesfakes
 import (
 	"sync"
 
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/sfu"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/sfu"
 	"github.com/livekit/protocol/codecs/mime"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"

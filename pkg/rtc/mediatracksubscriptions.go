@@ -25,8 +25,8 @@ import (
 	"github.com/pion/webrtc/v4"
 	"go.uber.org/atomic"
 
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/sfu"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/sfu"
 )
 
 var (

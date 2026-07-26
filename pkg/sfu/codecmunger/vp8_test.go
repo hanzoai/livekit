@@ -23,7 +23,7 @@ import (
 	"github.com/livekit/mediatransportutil/pkg/codec"
 	"github.com/livekit/protocol/logger"
 
-	"github.com/livekit/livekit-server/pkg/sfu/testutils"
+	"github.com/hanzoai/livekit/pkg/sfu/testutils"
 )
 
 func compare(expected *VP8, actual *VP8) bool {

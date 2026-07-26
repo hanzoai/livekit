@@ -26,9 +26,9 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
-	"github.com/livekit/livekit-server/pkg/sfu/connectionquality"
-	"github.com/livekit/livekit-server/pkg/sfu/rtpstats"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu/connectionquality"
+	"github.com/hanzoai/livekit/pkg/sfu/rtpstats"
 )
 
 var _ TrackReceiver = (*WebRTCReceiver)(nil)

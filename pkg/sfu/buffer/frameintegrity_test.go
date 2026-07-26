@@ -20,7 +20,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	dd "github.com/livekit/livekit-server/pkg/sfu/rtpextension/dependencydescriptor"
+	dd "github.com/hanzoai/livekit/pkg/sfu/rtpextension/dependencydescriptor"
 )
 
 func TestFrameIntegrityChecker(t *testing.T) {

@@ -22,11 +22,11 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/routing/routingfakes"
-	"github.com/livekit/livekit-server/pkg/service"
-	"github.com/livekit/livekit-server/pkg/service/servicefakes"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/routing/routingfakes"
+	"github.com/hanzoai/livekit/pkg/service"
+	"github.com/hanzoai/livekit/pkg/service/servicefakes"
 )
 
 func TestCreateRoom(t *testing.T) {

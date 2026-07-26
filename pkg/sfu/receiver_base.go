@@ -34,11 +34,11 @@ import (
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/mono"
 
-	"github.com/livekit/livekit-server/pkg/sfu/audio"
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
-	"github.com/livekit/livekit-server/pkg/sfu/rtpstats"
-	"github.com/livekit/livekit-server/pkg/sfu/streamtracker"
-	sfuutils "github.com/livekit/livekit-server/pkg/sfu/utils"
+	"github.com/hanzoai/livekit/pkg/sfu/audio"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu/rtpstats"
+	"github.com/hanzoai/livekit/pkg/sfu/streamtracker"
+	sfuutils "github.com/hanzoai/livekit/pkg/sfu/utils"
 )
 
 var (

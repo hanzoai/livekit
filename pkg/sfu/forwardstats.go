@@ -4,7 +4,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/livekit/livekit-server/pkg/telemetry/prometheus"
+	"github.com/hanzoai/livekit/pkg/telemetry/prometheus"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/mono"

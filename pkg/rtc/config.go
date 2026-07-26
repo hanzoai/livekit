@@ -18,10 +18,10 @@ import (
 	"github.com/pion/sdp/v3"
 	"github.com/pion/webrtc/v4"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
-	act "github.com/livekit/livekit-server/pkg/sfu/rtpextension/abscapturetime"
-	dd "github.com/livekit/livekit-server/pkg/sfu/rtpextension/dependencydescriptor"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
+	act "github.com/hanzoai/livekit/pkg/sfu/rtpextension/abscapturetime"
+	dd "github.com/hanzoai/livekit/pkg/sfu/rtpextension/dependencydescriptor"
 	"github.com/livekit/mediatransportutil/pkg/rtcconfig"
 )
 

@@ -18,8 +18,8 @@ import (
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 
-	"github.com/livekit/livekit-server/pkg/sfu"
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
 )
 
 type Track struct {

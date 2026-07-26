@@ -24,7 +24,7 @@ import (
 
 	goversion "github.com/hashicorp/go-version"
 	"github.com/pkg/errors"
-	"github.com/redis/go-redis/v9"
+	"github.com/hanzokv/go/v9"
 	"google.golang.org/protobuf/proto"
 
 	"github.com/livekit/protocol/ingress"
@@ -32,9 +32,9 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 
-	"github.com/livekit/livekit-server/version"
+	"github.com/hanzoai/livekit/version"
 )
 
 const (

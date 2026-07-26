@@ -5,9 +5,9 @@ import (
 	"context"
 	"sync"
 
-	"github.com/livekit/livekit-server/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/routing"
 	"github.com/livekit/protocol/livekit"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 )
 
 type FakeRoomManagerClient struct {

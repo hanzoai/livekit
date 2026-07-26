@@ -40,9 +40,9 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils/xtwirp"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/version"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/version"
 )
 
 type LivekitServer struct {

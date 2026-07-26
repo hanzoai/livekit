@@ -19,8 +19,8 @@ import (
 
 	"github.com/livekit/protocol/logger"
 
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
 )
 
 type signallerAsyncBaseParams struct {

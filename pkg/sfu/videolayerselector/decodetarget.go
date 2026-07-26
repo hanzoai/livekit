@@ -17,8 +17,8 @@ package videolayerselector
 import (
 	"fmt"
 
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
-	dd "github.com/livekit/livekit-server/pkg/sfu/rtpextension/dependencydescriptor"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
+	dd "github.com/hanzoai/livekit/pkg/sfu/rtpextension/dependencydescriptor"
 )
 
 type DecodeTarget struct {

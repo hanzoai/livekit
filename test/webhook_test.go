@@ -33,11 +33,11 @@ import (
 	"github.com/livekit/protocol/utils/protojson"
 	"github.com/livekit/protocol/webhook"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/service"
-	"github.com/livekit/livekit-server/pkg/testutils"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/service"
+	"github.com/hanzoai/livekit/pkg/testutils"
 )
 
 func TestWebhooks(t *testing.T) {

@@ -29,14 +29,14 @@ import (
 	"github.com/livekit/protocol/observability/roomobs"
 	"github.com/livekit/protocol/utils/mono"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/rtc/dynacast"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/sfu"
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
-	"github.com/livekit/livekit-server/pkg/sfu/connectionquality"
-	"github.com/livekit/livekit-server/pkg/sfu/interceptor"
-	"github.com/livekit/livekit-server/pkg/telemetry"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/rtc/dynacast"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/sfu"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu/connectionquality"
+	"github.com/hanzoai/livekit/pkg/sfu/interceptor"
+	"github.com/hanzoai/livekit/pkg/telemetry"
 	util "github.com/livekit/mediatransportutil"
 )
 

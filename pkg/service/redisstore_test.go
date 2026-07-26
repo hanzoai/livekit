@@ -29,7 +29,7 @@ import (
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
 
-	"github.com/livekit/livekit-server/pkg/service"
+	"github.com/hanzoai/livekit/pkg/service"
 )
 
 func redisStoreDocker(t testing.TB) *service.RedisStore {

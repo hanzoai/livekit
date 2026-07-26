@@ -23,11 +23,11 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/routing/selector"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/routing/selector"
 )
 
 type StandardRoomAllocator struct {

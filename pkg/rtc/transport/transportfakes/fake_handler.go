@@ -4,9 +4,9 @@ package transportfakes
 import (
 	"sync"
 
-	"github.com/livekit/livekit-server/pkg/rtc/transport"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/sfu/streamallocator"
+	"github.com/hanzoai/livekit/pkg/rtc/transport"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/sfu/streamallocator"
 	"github.com/livekit/protocol/livekit"
 	webrtc "github.com/pion/webrtc/v4"
 )

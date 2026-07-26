@@ -23,8 +23,8 @@ import (
 	"github.com/livekit/protocol/logger"
 	protosignalling "github.com/livekit/protocol/signalling"
 
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
 )
 
 func (p *ParticipantImpl) SwapResponseSink(sink routing.MessageSink, reason types.SignallingCloseReason) {

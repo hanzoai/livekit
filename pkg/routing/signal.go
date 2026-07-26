@@ -23,15 +23,15 @@ import (
 	"go.uber.org/atomic"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/telemetry/prometheus"
-	"github.com/livekit/livekit-server/pkg/utils"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/telemetry/prometheus"
+	"github.com/hanzoai/livekit/pkg/utils"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils/guid"
-	"github.com/livekit/psrpc"
-	"github.com/livekit/psrpc/pkg/middleware"
+	"github.com/hanzoai/psrpc"
+	"github.com/hanzoai/psrpc/pkg/middleware"
 )
 
 var ErrSignalWriteFailed = errors.New("signal write failed")

@@ -5,8 +5,8 @@ import (
 	"context"
 	"sync"
 
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/service"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/service"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 )

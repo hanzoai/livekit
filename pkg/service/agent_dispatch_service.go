@@ -18,14 +18,14 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/livekit/livekit-server/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/routing"
 	"github.com/livekit/protocol/agent"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 )
 
 type AgentDispatchService struct {

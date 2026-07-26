@@ -25,7 +25,7 @@ import (
 	"go.uber.org/atomic"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
 	"github.com/livekit/protocol/auth"
 	protoCodecs "github.com/livekit/protocol/codecs"
 	"github.com/livekit/protocol/codecs/mime"
@@ -37,12 +37,12 @@ import (
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/guid"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/routing/routingfakes"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/rtc/types/typesfakes"
-	"github.com/livekit/livekit-server/pkg/testutils"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/routing/routingfakes"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/rtc/types/typesfakes"
+	"github.com/hanzoai/livekit/pkg/testutils"
 )
 
 func TestIsReady(t *testing.T) {

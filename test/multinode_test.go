@@ -24,9 +24,9 @@ import (
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
 
-	"github.com/livekit/livekit-server/pkg/rtc"
-	"github.com/livekit/livekit-server/pkg/testutils"
-	"github.com/livekit/livekit-server/test/client"
+	"github.com/hanzoai/livekit/pkg/rtc"
+	"github.com/hanzoai/livekit/pkg/testutils"
+	"github.com/hanzoai/livekit/test/client"
 )
 
 func TestMultiNodeRouting(t *testing.T) {

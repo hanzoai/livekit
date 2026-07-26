@@ -24,7 +24,7 @@ import (
 	"github.com/google/wire"
 	"github.com/pion/turn/v5"
 	"github.com/pkg/errors"
-	"github.com/redis/go-redis/v9"
+	"github.com/hanzokv/go/v9"
 	"gopkg.in/yaml.v3"
 
 	"github.com/livekit/protocol/auth"
@@ -34,14 +34,14 @@ import (
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/webhook"
-	"github.com/livekit/psrpc"
-	"github.com/livekit/psrpc/pkg/middleware/otelpsrpc"
+	"github.com/hanzoai/psrpc"
+	"github.com/hanzoai/psrpc/pkg/middleware/otelpsrpc"
 
-	"github.com/livekit/livekit-server/pkg/agent"
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/sfu"
-	"github.com/livekit/livekit-server/pkg/telemetry"
+	"github.com/hanzoai/livekit/pkg/agent"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/sfu"
+	"github.com/hanzoai/livekit/pkg/telemetry"
 )
 
 func InitializeServer(conf *config.Config, currentNode routing.LocalNode) (*LivekitServer, error) {

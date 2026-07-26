@@ -33,13 +33,13 @@ import (
 	"github.com/livekit/protocol/utils"
 	"github.com/livekit/protocol/utils/mono"
 
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
-	"github.com/livekit/livekit-server/pkg/sfu/codecmunger"
-	dd "github.com/livekit/livekit-server/pkg/sfu/rtpextension/dependencydescriptor"
-	"github.com/livekit/livekit-server/pkg/sfu/rtpstats"
-	sfuutils "github.com/livekit/livekit-server/pkg/sfu/utils"
-	"github.com/livekit/livekit-server/pkg/sfu/videolayerselector"
-	"github.com/livekit/livekit-server/pkg/sfu/videolayerselector/temporallayerselector"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu/codecmunger"
+	dd "github.com/hanzoai/livekit/pkg/sfu/rtpextension/dependencydescriptor"
+	"github.com/hanzoai/livekit/pkg/sfu/rtpstats"
+	sfuutils "github.com/hanzoai/livekit/pkg/sfu/utils"
+	"github.com/hanzoai/livekit/pkg/sfu/videolayerselector"
+	"github.com/hanzoai/livekit/pkg/sfu/videolayerselector/temporallayerselector"
 )
 
 const (

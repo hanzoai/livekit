@@ -34,13 +34,13 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/rtc/transport"
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/sfu"
-	"github.com/livekit/livekit-server/pkg/sfu/datachannel"
-	"github.com/livekit/livekit-server/pkg/sfu/interceptor"
-	"github.com/livekit/livekit-server/pkg/sfu/pacer"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/rtc/transport"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/sfu"
+	"github.com/hanzoai/livekit/pkg/sfu/datachannel"
+	"github.com/hanzoai/livekit/pkg/sfu/interceptor"
+	"github.com/hanzoai/livekit/pkg/sfu/pacer"
 )
 
 const (

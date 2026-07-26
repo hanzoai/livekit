@@ -19,7 +19,7 @@ import (
 
 	"github.com/livekit/protocol/livekit"
 
-	"github.com/livekit/livekit-server/pkg/config"
+	"github.com/hanzoai/livekit/pkg/config"
 )
 
 // RegionAwareSelector prefers available nodes that are closest to the region of the current instance

@@ -10,14 +10,14 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/atomic"
 
-	"github.com/livekit/livekit-server/pkg/agent"
-	"github.com/livekit/livekit-server/pkg/agent/testutils"
+	"github.com/hanzoai/livekit/pkg/agent"
+	"github.com/hanzoai/livekit/pkg/agent/testutils"
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/utils/guid"
 	"github.com/livekit/protocol/utils/must"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 )
 
 func TestAgent(t *testing.T) {

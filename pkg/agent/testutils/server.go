@@ -14,17 +14,17 @@ import (
 	"github.com/frostbyte73/core"
 	"github.com/gammazero/deque"
 
-	"github.com/livekit/livekit-server/pkg/agent"
-	"github.com/livekit/livekit-server/pkg/config"
-	"github.com/livekit/livekit-server/pkg/routing"
-	"github.com/livekit/livekit-server/pkg/service"
+	"github.com/hanzoai/livekit/pkg/agent"
+	"github.com/hanzoai/livekit/pkg/config"
+	"github.com/hanzoai/livekit/pkg/routing"
+	"github.com/hanzoai/livekit/pkg/service"
 	"github.com/livekit/protocol/auth"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/utils/events"
 	"github.com/livekit/protocol/utils/guid"
 	"github.com/livekit/protocol/utils/must"
 	"github.com/livekit/protocol/utils/options"
-	"github.com/livekit/psrpc"
+	"github.com/hanzoai/psrpc"
 )
 
 type AgentService interface {

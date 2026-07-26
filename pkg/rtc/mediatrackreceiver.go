@@ -32,11 +32,11 @@ import (
 	"github.com/livekit/protocol/logger"
 	"github.com/livekit/protocol/utils"
 
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/sfu"
-	"github.com/livekit/livekit-server/pkg/sfu/buffer"
-	"github.com/livekit/livekit-server/pkg/sfu/rtpstats"
-	sutils "github.com/livekit/livekit-server/pkg/utils"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/sfu"
+	"github.com/hanzoai/livekit/pkg/sfu/buffer"
+	"github.com/hanzoai/livekit/pkg/sfu/rtpstats"
+	sutils "github.com/hanzoai/livekit/pkg/utils"
 )
 
 const (

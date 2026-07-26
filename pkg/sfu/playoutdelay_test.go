@@ -20,8 +20,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	pd "github.com/livekit/livekit-server/pkg/sfu/rtpextension/playoutdelay"
-	"github.com/livekit/livekit-server/pkg/sfu/rtpstats"
+	pd "github.com/hanzoai/livekit/pkg/sfu/rtpextension/playoutdelay"
+	"github.com/hanzoai/livekit/pkg/sfu/rtpstats"
 	"github.com/livekit/protocol/logger"
 )
 

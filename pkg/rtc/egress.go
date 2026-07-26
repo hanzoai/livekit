@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/livekit/livekit-server/pkg/rtc/types"
-	"github.com/livekit/livekit-server/pkg/telemetry"
+	"github.com/hanzoai/livekit/pkg/rtc/types"
+	"github.com/hanzoai/livekit/pkg/telemetry"
 	"github.com/livekit/protocol/livekit"
 	"github.com/livekit/protocol/rpc"
 	"github.com/livekit/protocol/webhook"
