@@ -42,6 +42,7 @@ require (
 	github.com/pion/turn/v5 v5.0.4
 	github.com/pion/webrtc/v4 v4.2.11
 	github.com/pkg/errors v0.9.1
+	github.com/prometheus/client_golang v1.22.0
 	github.com/rs/cors v1.11.1
 	github.com/stretchr/testify v1.11.1
 	github.com/thoas/go-funk v0.9.3
@@ -80,7 +81,6 @@ require (
 	github.com/olekukonko/cat v0.0.0-20250911104152-50322a0618f6 // indirect
 	github.com/olekukonko/errors v1.2.0 // indirect
 	github.com/olekukonko/ll v0.1.6 // indirect
-	github.com/prometheus/client_golang v1.22.0 // indirect
 	github.com/redis/go-redis/v9 v9.11.0 // indirect
 	go.opentelemetry.io/auto/sdk v1.2.1 // indirect
 	go.opentelemetry.io/otel v1.44.0 // indirect
