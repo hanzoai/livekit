@@ -1,6 +1,6 @@
 module github.com/hanzoai/livekit
 
-go 1.26.4
+go 1.26.5
 
 require (
 	github.com/bep/debounce v1.2.1
