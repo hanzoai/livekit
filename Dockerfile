@@ -12,8 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM golang:1.26.5-alpine AS builder
-ENV GOTOOLCHAIN=auto
+FROM golang:1.27.1-alpine AS builder
 
 ARG TARGETPLATFORM
 ARG TARGETARCH

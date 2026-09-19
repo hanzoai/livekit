@@ -1,0 +1,14 @@
+# Hanzo CI/CD for livekit. .github/workflows/cicd.yml is triggers and an import
+# of hanzoai/ci; everything real is here.
+
+test:
+  - name: build
+    run: go build ./cmd/server
+
+# No platforms line: the build door builds amd64 and arm64 natively and joins
+# them under one index. The Dockerfile already compiles for $TARGETARCH.
+images:
+  - name: livekit
+    repo: ghcr.io/hanzoai/livekit
+    context: .
+    dockerfile: Dockerfile
