@@ -12,6 +12,8 @@
 
 # LiveKit: Real-time video, audio and data for developers
 
+[![Open in Hanzo](https://hanzo.app/badges/open-in-hanzo.svg)](https://hanzo.app/dev/open?repo=github.com/hanzoai/livekit&ref=main&action=open) [![Edit with Hanzo](https://hanzo.app/badges/edit-with-hanzo.svg)](https://hanzo.app/dev/open?repo=github.com/hanzoai/livekit&ref=main&action=edit) [![Deploy with Hanzo](https://hanzo.app/badges/deploy-with-hanzo.svg)](https://hanzo.app/dev/open?repo=github.com/hanzoai/livekit&ref=main&action=deploy)
+
 [LiveKit](https://livekit.io) is an open source project that provides scalable, multi-user conferencing based on WebRTC.
 It's designed to provide everything you need to build real-time video audio data capabilities in your applications.
 
